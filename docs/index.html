@@ -3,390 +3,898 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Things I Made While Talking to Machines — Matt Harte</title>
-  <meta name="description" content="A portfolio of tools, visualizations, and automations built with Claude Code by Matt Harte — mortgage visualization, garden assistant, Claudelike Bar, and more.">
-  <meta name="robots" content="noindex, follow">
-  <link rel="canonical" href="https://lab.mattharte.com/">
-
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://lab.mattharte.com/">
-  <meta property="og:title" content="Things I Made While Talking to Machines — Matt Harte">
-  <meta property="og:description" content="A portfolio of tools, visualizations, and automations built with Claude Code by Matt Harte.">
-  <meta property="og:image" content="https://lab.mattharte.com/og.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Matt Harte's Lab — Things I Made While Talking to Machines">
-  <meta property="og:site_name" content="Matt Harte's Lab">
-
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Things I Made While Talking to Machines — Matt Harte">
-  <meta name="twitter:description" content="A portfolio of tools, visualizations, and automations built with Claude Code by Matt Harte.">
-  <meta name="twitter:image" content="https://lab.mattharte.com/og.png">
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Matt Harte's Lab",
-    "alternateName": "Things I Made While Talking to Machines",
-    "url": "https://lab.mattharte.com/",
-    "description": "A portfolio of tools, visualizations, and automations built with Claude Code by Matt Harte.",
-    "author": {
-      "@type": "Person",
-      "name": "Matt Harte",
-      "url": "https://mattharte.com/",
-      "sameAs": [
-        "https://www.linkedin.com/in/matt-harte/",
-        "https://github.com/harteWired"
-      ]
-    }
-  }
-  </script>
-
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-
-  <!-- Fonts -->
+  <title>Draft C v3 — Editorial · harteWired Lab</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --color-ink: oklch(0.13 0.015 270);
+      --color-cream: oklch(0.93 0.01 90);
+      --color-ember: oklch(0.78 0.14 55);
+      --color-sage: oklch(0.72 0.12 165);
+      --color-iris: oklch(0.45 0.12 290);
+      --color-clay: oklch(0.59 0.13 35);
+      --color-fern:    oklch(0.55 0.13 140);
+      --color-sky:     oklch(0.61 0.12 245);
+      --color-saffron: oklch(0.79 0.16 80);
+      --color-mist: oklch(0.60 0.02 270);
+      --color-bg-base: var(--color-ink);
+      --color-fg-base: var(--color-cream);
+      --color-fg-muted: var(--color-mist);
+      --color-fg-subtle: oklch(0.58 0.015 270);
+      --color-accent-primary: var(--color-ember);
+      --color-accent-glow: oklch(0.78 0.14 55 / 0.15);
+      --font-heading: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --letter-spacing-overline: 0.12em;
+      --cursor-spotlight-size: 600px;
+
+      /* set by JS when a tile is active so the card + lines share the tile's color */
+      --active-accent: var(--color-ember);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Bump root font-size so the page reads at ~1.4× the default zoom, like
+       the user already sets in their browser. Everything sized in rem scales. */
+    html { -webkit-font-smoothing: antialiased; overflow-x: clip; font-size: 22px; }
+    @media (max-width: 900px) { html { font-size: 18px; } }
+    body { font-family: var(--font-body); color: var(--color-fg-base); background: var(--color-bg-base); height: 100svh; overflow: hidden; }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+
+    .grain { position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.08; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 256px 256px; }
+    .cursor-spotlight { position: fixed; top: 0; left: 0; width: var(--cursor-spotlight-size); height: var(--cursor-spotlight-size); border-radius: 50%; background: radial-gradient(circle, var(--color-accent-glow) 0%, transparent 70%); pointer-events: none; z-index: -1; opacity: 0; transform: translate(-50%, -50%); transition: opacity 700ms; }
+    body:hover .cursor-spotlight { opacity: 1; }
+    .blobs { position: fixed; inset: 0; z-index: -1; pointer-events: none; background-image: url('/assets/blobs-bg.png'); background-size: cover; background-position: center; background-repeat: no-repeat; }
+
+    .topbar, .footbar { position: fixed; left: 0; right: 0; padding: clamp(1rem, 2.5vw, 1.75rem) clamp(1.5rem, 5vw, 4rem); display: flex; align-items: center; z-index: 10; font-family: var(--font-mono); font-size: 0.78rem; color: var(--color-fg-muted); letter-spacing: var(--letter-spacing-overline); text-transform: uppercase; }
+    /* Solid backdrop on the bars so scrolled content never reads through them. */
+    .topbar { top: 0; justify-content: space-between; background-color: oklch(0.13 0.015 270 / 0.92); border-bottom: 1px solid oklch(1 0 0 / 0.04); }
+    .footbar { bottom: 0; justify-content: center; background-color: oklch(0.13 0.015 270 / 0.92); border-top: 1px solid oklch(1 0 0 / 0.04); }
+    .topbar a, .footbar a { transition: color 200ms; }
+    .topbar a:hover, .footbar a:hover { color: var(--color-accent-primary); }
+    .wordmark { color: var(--color-accent-primary); font-weight: 600; letter-spacing: -0.02em; text-transform: none; font-size: 0.92rem; }
+
+    .stage { height: 100svh; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; padding: clamp(4rem, 6vh, 6rem) clamp(2rem, 6vw, 6rem); gap: clamp(2rem, 6vw, 6rem); position: relative; }
+    .col-left { max-width: 22rem; position: relative; z-index: 4; }
+    .col-right { display: grid; place-items: center; position: relative; aspect-ratio: 1; max-height: 70svh; justify-self: center; width: 100%; transition: opacity 280ms; }
+    .stage[data-active] .col-right { opacity: 0.35; }
+
+    .lockup { font-family: var(--font-heading); }
+    .lockup__overline { font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-fg-subtle); letter-spacing: var(--letter-spacing-overline); text-transform: uppercase; margin-bottom: 1.25rem; }
+    .lockup__line1 { font-weight: 700; font-style: italic; font-size: clamp(2.4rem, 6vw, 4.5rem); line-height: 0.92; color: var(--color-fg-base); letter-spacing: -0.02em; }
+    .lockup__line2 { font-weight: 400; font-style: normal; font-size: clamp(2.4rem, 6vw, 4.5rem); line-height: 0.92; color: var(--color-accent-primary); letter-spacing: -0.02em; }
+    .lockup__sub { font-size: 1.05rem; line-height: 1.55; color: var(--color-fg-muted); margin-top: 1.25rem; max-width: 28rem; }
+    .lockup__sub em { font-style: italic; color: var(--color-accent-primary); font-weight: 500; }
+
+    .tiles { margin-top: clamp(1.75rem, 4vh, 2.75rem); display: flex; flex-direction: column; list-style: none; padding: 0; margin-left: 0; }
+    .tile-item { list-style: none; }
+    .tile { display: flex; align-items: center; gap: 0.85rem; padding: 0.7rem 0; border-top: 1px solid oklch(1 0 0 / 0.08); cursor: pointer; position: relative; min-width: 0; }
+    .tile-item:last-child .tile { border-bottom: 1px solid oklch(1 0 0 / 0.08); }
+    /* No padding-left shift on hover — the dot must stay put so the lightning
+       origin (measured at page load) lines up with the dot's actual centre. */
+    /* Colored accent dot — the lightning's visible source point. */
+    .tile__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent, var(--color-accent-primary)); box-shadow: 0 0 8px var(--accent, var(--color-accent-primary)); transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 240ms; flex-shrink: 0; }
+    .tile.is-active .tile__dot, .tile:hover .tile__dot { transform: scale(1.4); box-shadow: 0 0 14px var(--accent, var(--color-accent-primary)); }
+    .tile__name { font-family: var(--font-heading); font-style: italic; font-size: 1.15rem; color: var(--color-fg-base); transition: color 240ms; white-space: nowrap; flex-shrink: 0; }
+    .tile:hover .tile__name, .tile.is-active .tile__name { color: var(--accent, var(--color-accent-primary)); }
+    .tile__tag { font-family: var(--font-mono); font-size: 0.68rem; color: var(--color-fg-subtle); letter-spacing: var(--letter-spacing-overline); text-transform: uppercase; transition: color 240ms; margin-left: auto; text-align: right; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tile:hover .tile__tag, .tile.is-active .tile__tag { color: var(--color-fg-muted); }
+    /* Mobile-only inline detail expansion (populated by JS on tap) */
+    .tile-detail { display: none; }
+
+    /* Routing SVG covers the entire stage. JS computes a per-tile path that
+       branches from the dot rightward into the description card. Multiple
+       paths per tile let us cascade the draw timing. */
+    .routing { position: absolute; inset: 0; pointer-events: none; z-index: 2; overflow: visible; }
+    .routing path { fill: none; stroke: var(--accent, var(--color-accent-primary)); stroke-width: 1; stroke-linecap: square; stroke-linejoin: miter; opacity: 0; }
+    /* The main path — underline, winning lightning trunk, box outline — all
+       share one intentional line weight that draws smoothly from origin to
+       destination. Failed forks are hair-thin background noise. */
+    .routing path[data-active] { opacity: 0.92; filter: drop-shadow(0 0 4px var(--accent)); }
+    /* Main path: underline + trunk — slimmer line weight (1.3) so the box
+       outline reads as the dominant frame. */
+    .routing path.persistent[data-active],
+    .routing path.main-seg[data-active] {
+      opacity: 1;
+      stroke-width: 1.3;
+      filter: drop-shadow(0 0 3px var(--accent)) drop-shadow(0 0 10px oklch(from var(--accent) l c h / 0.5));
+    }
+    /* Box outline carries a heavier base weight to read as the destination
+       frame around the tile. */
+    .routing path.box-outline[data-active] {
+      stroke-width: 1.9;
+      filter: drop-shadow(0 0 4px var(--accent)) drop-shadow(0 0 14px oklch(from var(--accent) l c h / 0.55));
+    }
+    /* Pulsed wave: each main-path element thickens right after it draws. */
+    .routing path.persistent.pulsed[data-active],
+    .routing path.main-seg.pulsed[data-active] {
+      stroke-width: 2.2;
+      filter: drop-shadow(0 0 6px var(--accent)) drop-shadow(0 0 16px oklch(from var(--accent) l c h / 0.7));
+    }
+    .routing path.box-outline.pulsed[data-active] {
+      stroke-width: 2.8;
+      filter: drop-shadow(0 0 7px var(--accent)) drop-shadow(0 0 18px oklch(from var(--accent) l c h / 0.7));
+    }
+    /* Failed forks: thin, dim, background — they show the chaos without
+       competing with the main line. */
+    .routing path.leader[data-active] {
+      opacity: 0.34;
+      stroke-width: 0.55;
+      filter: drop-shadow(0 0 1.5px var(--accent));
+    }
+
+    /* Description card — no popup chrome. CENTERED at standard desktop
+       widths. At narrower desktop widths the lockup column is close enough
+       to clip the card, so we right-anchor instead (overlap the rabbit
+       rather than crash the text). The SVG paths draw the visible boundary;
+       a subtle bg fades in inside that boundary AFTER the lines have
+       completed; text fades in last. */
+    .description-card { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: clamp(260px, 26vw, 360px); padding: 1.3rem 1.5rem; pointer-events: none; z-index: 3; }
+    /* Below 1500px the centred card would clip the lockup, so kick over to
+       right-anchored (overlap the rabbit instead). At narrow square / 8:9
+       viewports this is what saves the readability. */
+    @media (max-width: 1499px) {
+      .description-card { left: auto; right: clamp(2rem, 6vw, 6rem); transform: translateY(-50%); }
+    }
+    /* Extend the bg fill BEYOND the card's content edge so it reaches the
+       outline. Without this the outline appears to "hover" with a visible
+       ring of unfilled backdrop between the card text and the box stroke.
+       Fast 160ms fade-out (default rule). Slow synced fade-in only when
+       .is-active is set; in/out durations decoupled. */
+    .description-card::before { content: ''; position: absolute; inset: -10px; background: oklch(0.13 0.015 270 / 0.55); opacity: 0; transition: opacity 160ms ease-in; pointer-events: none; z-index: -1; }
+    .description-card.is-active::before { opacity: 1; transition: opacity var(--bg-duration, 320ms) ease-out; transition-delay: var(--bg-delay, 1100ms); }
+    .description-card__name,
+    .description-card__body,
+    .description-card__meta { opacity: 0; transition: opacity 140ms ease-in; }
+    .description-card.is-active .description-card__name,
+    .description-card.is-active .description-card__body,
+    .description-card.is-active .description-card__meta { opacity: 1; transition: opacity 180ms cubic-bezier(0.16, 1, 0.3, 1); transition-delay: var(--text-delay, 700ms); }
+    /* text-shadow gives legibility against the bg blob without needing a fill */
+    .description-card__name { font-family: var(--font-heading); font-style: italic; font-weight: 700; font-size: 1.45rem; color: var(--color-fg-base); margin-bottom: 0.5rem; line-height: 1; text-shadow: 0 0 14px var(--color-bg-base), 0 0 4px var(--color-bg-base); }
+    .description-card__name::after { content: '.'; color: var(--active-accent); }
+    .description-card__body { font-size: 0.9rem; line-height: 1.55; color: var(--color-fg-muted); text-shadow: 0 0 10px var(--color-bg-base); }
+    .description-card__meta { display: flex; justify-content: space-between; gap: 1rem; margin-top: 0.85rem; padding-top: 0.7rem; border-top: 1px solid oklch(1 0 0 / 0.07); font-family: var(--font-mono); font-size: 0.66rem; color: var(--color-fg-subtle); letter-spacing: var(--letter-spacing-overline); text-transform: uppercase; }
+    .description-card__meta strong { color: var(--active-accent); font-weight: 500; }
+
+    /* rabbit stage */
+    .rabbit-stage { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+    .rabbit-rings { position: absolute; inset: 0; }
+    .rabbit-rings circle { fill: none; }
+    .rabbit-img { position: relative; width: 64%; height: 64%; object-fit: contain; filter: drop-shadow(0 0 80px oklch(0.78 0.14 55 / 0.22)); z-index: 1; }
+    /* Same mono style as before, just made tappable. Color stays the same on
+       hover — only a subtle warm glow appears, no color shift. */
+    .rabbit-caption { position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%); font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-fg-subtle); letter-spacing: var(--letter-spacing-overline); text-transform: uppercase; white-space: nowrap; transition: text-shadow 240ms ease; cursor: pointer; }
+    .rabbit-caption:hover, .rabbit-caption:focus-visible { text-shadow: 0 0 6px oklch(0.93 0.01 90 / 0.45); }
+
+    /* MOBILE — separate layout from desktop. Desktop's hover + lightning +
+       persistent description card all hidden. Mobile shows:
+       • Lockup top-left, with right-padding so the rabbit fits beside it.
+       • Rabbit absolute top-right — small (88px), rings hidden, "Down the
+         rabbit hole" caption tucked below as a tappable link.
+       • Tile list below: each row is a button. Tapping toggles an inline
+         expanded panel underneath the row with the description, meta, and
+         a "Visit →" link as the explicit navigation control. The tile
+         itself doesn't navigate on tap (mobile only).
+    */
+    @media (max-width: 900px) {
+      body { overflow-y: auto; height: auto; min-height: 100svh; }
+      .stage {
+        display: block;
+        position: relative;
+        height: auto;
+        padding: 4.75rem 1.4rem 4rem;
+      }
+      .col-left { max-width: none; width: 100%; }
+
+      /* Rabbit pinned to top-right, smaller */
+      .col-right {
+        position: absolute;
+        top: 4.75rem;
+        right: 1.4rem;
+        width: 88px;
+        height: 122px;          /* rabbit + caption stacked */
+        max-height: none;
+        aspect-ratio: auto;
+        margin: 0;
+        z-index: 5;
+      }
+      .col-right .rabbit-stage { width: 88px; height: 88px; }
+      .col-right .rabbit-rings { display: none; }
+      .col-right .rabbit-img { width: 100%; height: 100%; }
+      .col-right .rabbit-caption {
+        position: static;
+        transform: none;
+        text-align: center;
+        font-size: 0.55rem;
+        margin-top: 0.4rem;
+        line-height: 1.2;
+        white-space: normal;
+        padding: 0.25rem 0.4rem;
+      }
+
+      /* Lockup leaves room on the right for the rabbit */
+      .lockup { padding-right: 110px; min-height: 110px; }
+      .lockup__overline { margin-bottom: 0.85rem; color: oklch(0.68 0.015 270); }
+      .lockup__line1, .lockup__line2 { font-size: clamp(2rem, 9vw, 2.6rem); }
+      .lockup__sub { font-size: 0.95rem; max-width: none; padding-right: 0; color: oklch(0.82 0.01 270); }
+
+      /* No lightning, no card on mobile */
+      .routing { display: none; }
+      .description-card { display: none; }
+
+      /* Tiles — colored dot left, name+tag stacked middle, chevron right. */
+      .tile {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        column-gap: 0.7rem;
+        row-gap: 0.15rem;
+        padding: 0.95rem 0.25rem;
+        align-items: baseline;
+        position: relative;
+        border-left: 2px solid transparent;
+        padding-left: 0.7rem;
+        margin-left: -0.7rem;
+        transition: border-color 200ms;
+      }
+      .tile-item.is-expanded > .tile {
+        border-left-color: var(--accent);
+        padding-left: 0.85rem;
+      }
+      .tile__dot {
+        grid-column: 1;
+        grid-row: 1 / span 2;
+        align-self: center;
+      }
+      .tile__name {
+        grid-column: 2; grid-row: 1;
+        color: oklch(0.94 0.01 90);  /* brighter on mobile */
+      }
+      .tile-item.is-expanded > .tile .tile__name { color: var(--accent); }
+      .tile__tag {
+        grid-column: 2; grid-row: 2;
+        margin-left: 0;
+        text-align: left;
+        white-space: normal;
+        overflow: visible;
+        font-size: 0.72rem;
+        color: oklch(0.74 0.01 270);  /* brighter on mobile */
+      }
+      .tile::after {
+        content: '';
+        grid-column: 3; grid-row: 1 / span 2;
+        align-self: center;
+        width: 8px; height: 8px;
+        border-right: 1.5px solid oklch(0.65 0.01 270);
+        border-bottom: 1.5px solid oklch(0.65 0.01 270);
+        transform: rotate(45deg);
+        transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms;
+      }
+      .tile-item.is-expanded > .tile::after {
+        transform: rotate(-135deg);
+        border-color: var(--accent);
+      }
+
+      /* Inline expansion */
+      .tile-detail {
+        display: block;
+        max-height: 0;
+        overflow: hidden;
+        padding-left: 0.85rem;
+        margin-left: -0.7rem;
+        border-left: 2px solid var(--accent);
+        background: oklch(1 0 0 / 0.02);
+        transition: max-height 320ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .tile-item.is-expanded .tile-detail {
+        max-height: 360px;
+      }
+      .tile-detail__inner { padding: 0.7rem 0.4rem 1.1rem 0.6rem; }
+      .tile-detail__body { font-size: 0.92rem; line-height: 1.55; color: oklch(0.86 0.01 270); }
+      .tile-detail__meta {
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        text-transform: uppercase;
+        letter-spacing: var(--letter-spacing-overline);
+        color: oklch(0.7 0.01 270);
+        margin-top: 0.65rem;
+      }
+      .tile-detail__visit {
+        display: inline-block;
+        margin-top: 0.85rem;
+        padding: 0.55rem 1rem;
+        background: var(--accent);
+        color: var(--color-bg-base);
+        border-radius: 4px;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: var(--letter-spacing-overline);
+        font-weight: 600;
+      }
+
+      /* Top + foot bars */
+      .topbar, .footbar { padding: 0.9rem 1.4rem; font-size: 0.65rem; }
+      .footbar { position: relative; bottom: auto; margin-top: 2rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .routing path[data-active], .description-card { transition: none; }
+      .cursor-spotlight { display: none; }
+    }
+  </style>
 </head>
 <body>
-
-  <!-- Skip link -->
-  <a href="#main" class="skip-link">Skip to content</a>
-
-  <!-- Grain overlay -->
+  <div class="blobs" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
-
-  <!-- Cursor spotlight -->
   <div class="cursor-spotlight" aria-hidden="true"></div>
 
-  <!-- Morphing blobs background -->
-  <div id="morphing-blobs" class="morphing-blobs" aria-hidden="true"></div>
-
-  <!-- Navigation -->
-  <header class="nav">
-    <nav aria-label="Main navigation">
-      <a href="#" class="nav__logo" aria-label="Home">
-        <img class="nav__rabbit" src="assets/whiterabbiticon2.png" alt="" width="36" height="36" aria-hidden="true">
-        harteWired
-      </a>
-      <ul class="nav__links">
-        <li><a href="#about" class="nav__link">About</a></li>
-        <li><a href="#portfolio" class="nav__link">Work</a></li>
-        <li><a href="#process" class="nav__link">Process</a></li>
-        <li><a href="#contact" class="nav__link">Contact</a></li>
-      </ul>
-      <button type="button" class="nav__toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle menu">
-        <span class="nav__toggle-bar"></span>
-        <span class="nav__toggle-bar"></span>
-      </button>
-    </nav>
+  <header class="topbar" aria-label="Header">
+    <a class="wordmark" href="https://github.com/harteWired" aria-label="harteWired on GitHub">harteWired</a>
+    <span>Draft C v3 · Editorial</span>
   </header>
 
-  <!-- Mobile menu -->
-  <div class="nav-overlay" id="nav-menu" hidden>
-    <ul class="nav-overlay__links">
-      <li><a href="#about" class="nav-overlay__link" tabindex="-1">About</a></li>
-      <li><a href="#portfolio" class="nav-overlay__link" tabindex="-1">Work</a></li>
-      <li><a href="#process" class="nav-overlay__link" tabindex="-1">Process</a></li>
-      <li><a href="#contact" class="nav-overlay__link" tabindex="-1">Contact</a></li>
-    </ul>
-  </div>
+  <main class="stage" id="stage">
+    <svg class="routing" id="routing" aria-hidden="true"></svg>
+    <div class="description-card" id="card" role="region" aria-live="polite" aria-label="Active project">
+      <h3 class="description-card__name" id="cardName"></h3>
+      <p class="description-card__body" id="cardBody"></p>
+      <div class="description-card__meta"><span id="cardMeta1"></span><strong id="cardMeta2"></strong></div>
+    </div>
 
-  <main id="main">
+    <div class="col-left">
+      <div class="lockup">
+        <p class="lockup__overline">harteWired Lab</p>
+        <h1>
+          <span class="lockup__line1">AI-native</span><br>
+          <span class="lockup__line2">projects.</span>
+        </h1>
+        <p class="lockup__sub">Tools, visualizations, automations, circuits, 3D models, and more &mdash; all conjured through conversation. <em>For funsies.</em></p>
+      </div>
 
-    <!-- Hero -->
-    <section class="hero" aria-label="Hero">
-      <!-- Hero rabbit decoration -->
-      <div class="hero__decoration" aria-hidden="true">
-        <svg class="hero__rings" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="300" cy="300" r="34.77" fill="none" stroke="oklch(0.72 0.12 165)" stroke-width="1.5" opacity="0.12"/>
-          <circle cx="300" cy="300" r="66.98" fill="none" stroke="oklch(0.78 0.14 55)" stroke-width="1.42" opacity="0.11"/>
-          <circle cx="300" cy="300" r="104.82" fill="none" stroke="oklch(0.72 0.12 165)" stroke-width="1.35" opacity="0.11"/>
-          <circle cx="300" cy="300" r="136.72" fill="none" stroke="oklch(0.78 0.14 55)" stroke-width="1.27" opacity="0.1"/>
-          <circle cx="300" cy="300" r="165.46" fill="none" stroke="oklch(0.72 0.12 165)" stroke-width="1.2" opacity="0.09"/>
-          <circle cx="300" cy="300" r="202.77" fill="none" stroke="oklch(0.78 0.14 55)" stroke-width="1.13" opacity="0.08"/>
-          <circle cx="300" cy="300" r="233.95" fill="none" stroke="oklch(0.72 0.12 165)" stroke-width="1.05" opacity="0.08"/>
-          <circle cx="300" cy="300" r="271.26" fill="none" stroke="oklch(0.78 0.14 55)" stroke-width="0.97" opacity="0.07"/>
+      <ul class="tiles" id="tiles">
+        <li class="tile-item" style="--accent: var(--color-sage);">
+          <a class="tile" data-key="claudelike-bar" href="https://lab.mattharte.com/claudelike-bar/">
+            <span class="tile__dot"></span>
+            <span class="tile__name">claudelike-bar</span>
+            <span class="tile__tag">live status for every Claude terminal</span>
+          </a>
+        </li>
+        <li class="tile-item" style="--accent: var(--color-saffron);">
+          <a class="tile" data-key="ai-3d-modeling" href="https://github.com/harteWired/ai-3d-modeling">
+            <span class="tile__dot"></span>
+            <span class="tile__name">ai 3d-modeling</span>
+            <span class="tile__tag">complex 3D parts from plain English</span>
+          </a>
+        </li>
+        <li class="tile-item" style="--accent: var(--color-ember);">
+          <a class="tile" data-key="text-to-tape" href="https://lab.mattharte.com/text-to-tape/">
+            <span class="tile__dot"></span>
+            <span class="tile__name">text-to-tape</span>
+            <span class="tile__tag">batch labels in plain English</span>
+          </a>
+        </li>
+        <li class="tile-item" style="--accent: var(--color-sky);">
+          <a class="tile" data-key="belfry" href="https://hartewired.github.io/belfry/">
+            <span class="tile__dot"></span>
+            <span class="tile__name">belfry</span>
+            <span class="tile__tag">all your sessions in one telegram</span>
+          </a>
+        </li>
+        <li class="tile-item" style="--accent: var(--color-iris);">
+          <a class="tile" data-key="mortgage-viz" href="https://hartewired.github.io/mortgage-viz/">
+            <span class="tile__dot"></span>
+            <span class="tile__name">mortgage-viz</span>
+            <span class="tile__tag">heatmap every plausible monthly</span>
+          </a>
+        </li>
+        <li class="tile-item" style="--accent: var(--color-clay);">
+          <a class="tile" data-key="mushroom-controller" href="https://github.com/harteWired/automated-martha-tek">
+            <span class="tile__dot"></span>
+            <span class="tile__name">mushroom controller</span>
+            <span class="tile__tag">a fruiting chamber that runs itself</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="col-right">
+      <div class="rabbit-stage">
+        <svg class="rabbit-rings" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="300" cy="300" r="170" stroke="oklch(0.78 0.14 55 / 0.20)" stroke-width="1"/>
+          <circle cx="300" cy="300" r="240" stroke="oklch(0.72 0.12 165 / 0.16)" stroke-width="1"/>
+          <circle cx="300" cy="300" r="295" stroke="oklch(0.78 0.14 55 / 0.10)" stroke-width="1"/>
         </svg>
-        <img class="hero__rabbit" src="assets/whiterabbiticon2.png" alt="" width="400" height="400" loading="eager">
+        <img class="rabbit-img" src="/assets/whiterabbiticon2.png" alt="harteWired rabbit">
+        <a class="rabbit-caption" href="/follow/" aria-label="Visit the original AI-native projects page">Down the rabbit hole</a>
       </div>
-      <div class="hero__content">
-        <p class="hero__overline">Built with Claude Code</p>
-        <h1 class="hero__headline" data-split="words">Things I Made While Talking to Machines</h1>
-        <p class="hero__subhead">A portfolio of tools, visualizations, and automations&mdash;all conjured through conversation with AI.</p>
-        <div class="hero__cta">
-          <a href="#portfolio" class="btn btn--primary">See the Work</a>
-        </div>
-      </div>
-      <div class="hero__scroll-indicator" aria-hidden="true">
-        <span>Scroll</span>
-        <div class="hero__scroll-line"></div>
-      </div>
-    </section>
-
-    <!-- About -->
-    <section class="section section--about" id="about" aria-labelledby="about-heading">
-      <div class="section__container">
-        <div class="about__layout">
-          <div class="about__decorative" aria-hidden="true">
-            <img class="about__rabbit" src="assets/whiterabbiticon2.png" alt="" width="200" height="200">
-          </div>
-          <div class="about__text">
-            <h2 class="section__heading" id="about-heading">Down the Rabbit Hole</h2>
-            <div class="about__body">
-              <p>We are all mad here, and the madness is this: you can describe a thing that does not yet exist and watch it assemble itself before your eyes. Not with hammers or compilers, but with words&mdash;plain, imprecise, beautifully human words.</p>
-              <p>&ldquo;Begin at the beginning,&rdquo; the King said, very gravely, &ldquo;and go on till you come to the end: then stop.&rdquo; But the beginning is a conversation, and the end is a living, breathing tool. The middle is where the curious magic happens&mdash;where intent becomes implementation, where a mumbled wish becomes working code.</p>
-              <p>Every project here began as a thought spoken aloud to Claude. Some emerged fully formed, like Athena from the forehead of Zeus. Others required patience, iteration, the occasional argument about semicolons. All of them exist because the distance between imagination and creation has collapsed to the width of a prompt.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Portfolio -->
-    <section class="section section--portfolio" id="portfolio" aria-labelledby="portfolio-heading">
-      <div class="section__container">
-        <header class="section__header">
-          <p class="section__overline">The Collection</p>
-          <h2 class="section__heading" id="portfolio-heading">Six Projects, Six Rabbit Holes</h2>
-        </header>
-        <div class="bento">
-
-          <div class="bento__row bento__row--featured">
-
-          <!-- Row 1: two wide cards -->
-          <article class="bento__card bento__card--featured">
-            <div class="bento__tags">
-              <span class="bento__tag">VS Code</span>
-              <span class="bento__tag">Extension</span>
-              <span class="bento__tag">Claude Code</span>
-              <span class="bento__tag">Hooks</span>
-            </div>
-            <h3 class="bento__title">Claudelike Bar</h3>
-            <p class="bento__text">A VS Code sidebar that shows what every Claude Code terminal is doing at a glance. Live status tiles with animated dots, color-coded borders, drag-and-drop reordering, context window tracking, and a passive-aggressive mode that guilt-trips you when you ignore it. What would you do for a Claudelike Bar?</p>
-            <div class="bento__links">
-              <a href="https://github.com/harteWired/claudelike-bar" class="bento__link" target="_blank" rel="noopener noreferrer">
-                View on GitHub <span aria-hidden="true">&rarr;</span>
-              </a>
-              <a href="https://lab.mattharte.com/claudelike-bar/" class="bento__link bento__link--secondary" target="_blank" rel="noopener noreferrer">
-                Live Preview <span aria-hidden="true">&rarr;</span>
-              </a>
-            </div>
-          </article>
-
-          <article class="bento__card bento__card--featured">
-            <div class="bento__tags">
-              <span class="bento__tag">OpenSCAD</span>
-              <span class="bento__tag">3D Printing</span>
-              <span class="bento__tag">Validation</span>
-            </div>
-            <h3 class="bento__title">AI 3D Modeling</h3>
-            <p class="bento__text">Claude writes OpenSCAD models from natural language, validates them automatically, and iterates until they pass structural and printability checks.</p>
-            <div class="bento__links">
-              <a href="https://github.com/harteWired/ai-3d-modeling" class="bento__link" target="_blank" rel="noopener noreferrer">
-                View on GitHub <span aria-hidden="true">&rarr;</span>
-              </a>
-              <a href="https://github.com/harteWired/ai-3d-modeling/blob/main/docs/humidity-output-v2.md" class="bento__link bento__link--secondary" target="_blank" rel="noopener noreferrer">
-                Design Example <span aria-hidden="true">&rarr;</span>
-              </a>
-            </div>
-          </article>
-
-          </div>
-          <div class="bento__row">
-
-          <!-- Row 2: four regular cards -->
-          <article class="bento__card">
-            <div class="bento__tags">
-              <span class="bento__tag">GSAP</span>
-              <span class="bento__tag">Playwright</span>
-              <span class="bento__tag">Node.js</span>
-            </div>
-            <h3 class="bento__title">Web Design Pipeline</h3>
-            <p class="bento__text">A pipeline that builds award-quality websites from YAML design briefs. Claude generates HTML/CSS/JS, validates with Playwright and axe-core, then iterates until convergence. This very page was built by it.</p>
-            <a href="https://github.com/harteWired/web-design-pipeline" class="bento__link" target="_blank" rel="noopener noreferrer">
-              View on GitHub <span aria-hidden="true">&rarr;</span>
-            </a>
-          </article>
-
-          <article class="bento__card">
-            <div class="bento__tags">
-              <span class="bento__tag">React</span>
-              <span class="bento__tag">D3.js</span>
-              <span class="bento__tag">Heatmap</span>
-            </div>
-            <h3 class="bento__title">Mortgage Viz</h3>
-            <p class="bento__text">Interactive mortgage payment heatmap with amortization schedules, affordability overlays, and scenario comparison&mdash;turning opaque financial math into tactile visual understanding.</p>
-            <div class="bento__links">
-              <a href="https://github.com/harteWired/mortgage-viz" class="bento__link" target="_blank" rel="noopener noreferrer">
-                View on GitHub <span aria-hidden="true">&rarr;</span>
-              </a>
-              <a href="https://hartewired.github.io/mortgage-viz/" class="bento__link bento__link--secondary" target="_blank" rel="noopener noreferrer">
-                See the Output <span aria-hidden="true">&rarr;</span>
-              </a>
-            </div>
-          </article>
-
-          <article class="bento__card">
-            <div class="bento__tags">
-              <span class="bento__tag">ESP32 HW</span>
-              <span class="bento__tag">Firmware</span>
-              <span class="bento__tag">IoT</span>
-            </div>
-            <h3 class="bento__title">Mushroom Controller</h3>
-            <p class="bento__text">Full AI-native design&mdash;hardware, firmware, web app, HA integration&mdash;and build guide for a fully automated Martha tent fruiting chamber.</p>
-            <div class="bento__links">
-              <a href="https://github.com/harteWired/automated-martha-tek" class="bento__link" target="_blank" rel="noopener noreferrer">
-                View on GitHub <span aria-hidden="true">&rarr;</span>
-              </a>
-              <a href="https://github.com/harteWired/automated-martha-tek/blob/main/controller-build/hardware/diy-controller-build-guide.md" class="bento__link bento__link--secondary" target="_blank" rel="noopener noreferrer">
-                Build Guide <span aria-hidden="true">&rarr;</span>
-              </a>
-            </div>
-          </article>
-
-          <article class="bento__card">
-            <div class="bento__tags">
-              <span class="bento__tag">HTML</span>
-              <span class="bento__tag">Planning</span>
-              <span class="bento__tag">Scheduling</span>
-            </div>
-            <h3 class="bento__title">Garden Assist</h3>
-            <p class="bento__text">A home vegetable garden planner for Zone 6b Warren County NJ. Plans planting schedules, companion groupings, and harvest windows.</p>
-            <div class="bento__links">
-              <a href="https://github.com/harteWired/garden-assist" class="bento__link" target="_blank" rel="noopener noreferrer">
-                View on GitHub <span aria-hidden="true">&rarr;</span>
-              </a>
-              <a href="https://hartewired.github.io/garden-assist/app/garden-hq.html" class="bento__link bento__link--secondary" target="_blank" rel="noopener noreferrer">
-                See the Output <span aria-hidden="true">&rarr;</span>
-              </a>
-            </div>
-          </article>
-
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Process -->
-    <section class="section section--process" id="process" aria-labelledby="process-heading">
-      <div class="section__container">
-        <header class="section__header">
-          <p class="section__overline">The Method</p>
-          <h2 class="section__heading" id="process-heading">How the Sausage Gets Made</h2>
-          <p class="section__description">Or: a reasonably accurate account of talking to machines until things appear.</p>
-        </header>
-        <div class="timeline">
-
-          <div class="timeline__item">
-            <div class="timeline__marker" aria-hidden="true"><span>1</span></div>
-            <div class="timeline__content">
-              <h3 class="timeline__title">The Incantation</h3>
-              <p class="timeline__text">&ldquo;Curiouser and curiouser!&rdquo; cried Alice. You describe what you want in plain language&mdash;a visualization, a tool, a guide. The words don&rsquo;t need to be precise. They need to be honest.</p>
-            </div>
-          </div>
-
-          <div class="timeline__item">
-            <div class="timeline__marker" aria-hidden="true"><span>2</span></div>
-            <div class="timeline__content">
-              <h3 class="timeline__title">The Interpretation</h3>
-              <p class="timeline__text">Claude reads your words the way the Cheshire Cat reads intentions&mdash;not literally, but deeply. It maps your wish to patterns, structures, and idioms it has consumed from the collective output of a million developers.</p>
-            </div>
-          </div>
-
-          <div class="timeline__item">
-            <div class="timeline__marker" aria-hidden="true"><span>3</span></div>
-            <div class="timeline__content">
-              <h3 class="timeline__title">The Manifestation</h3>
-              <p class="timeline__text">Code appears. Not all at once, but in thoughtful layers: structure first, then style, then motion. Like watching a photograph develop in a darkroom, the thing you described slowly resolves into focus.</p>
-            </div>
-          </div>
-
-          <div class="timeline__item">
-            <div class="timeline__marker" aria-hidden="true"><span>4</span></div>
-            <div class="timeline__content">
-              <h3 class="timeline__title">The Negotiation</h3>
-              <p class="timeline__text">&ldquo;Would you tell me, please, which way I ought to go from here?&rdquo; You review, you redirect, you refine. The machine does not sulk. It does not insist. It simply listens, adjusts, and tries again.</p>
-            </div>
-          </div>
-
-          <div class="timeline__item">
-            <div class="timeline__marker" aria-hidden="true"><span>5</span></div>
-            <div class="timeline__content">
-              <h3 class="timeline__title">The Arrival</h3>
-              <p class="timeline__text">And then, quite suddenly, it works. The visualization renders. The model prints. The garden plan makes sense. You&rsquo;ve arrived somewhere you couldn&rsquo;t have reached alone, by a path that didn&rsquo;t exist until you walked it.</p>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- Philosophy -->
-    <section class="section section--philosophy" id="philosophy" aria-labelledby="philosophy-heading">
-      <div class="section__container">
-        <div class="philosophy__layout">
-          <div class="philosophy__quote" aria-hidden="true">
-            <span class="philosophy__mark">&ldquo;</span>
-          </div>
-          <div class="philosophy__text">
-            <h2 class="section__heading" id="philosophy-heading">The Tea Party Manifesto</h2>
-            <blockquote class="philosophy__blockquote">
-              <p>&ldquo;Take some more tea,&rdquo; the March Hare said to Alice, very earnestly. &ldquo;I&rsquo;ve had nothing yet,&rdquo; Alice replied, &ldquo;so I can&rsquo;t take more.&rdquo; &ldquo;You mean you can&rsquo;t take <em>less</em>,&rdquo; said the Hatter. &ldquo;It&rsquo;s very easy to take more than nothing.&rdquo;</p>
-            </blockquote>
-            <div class="philosophy__body">
-              <p>And that is precisely the point. Every tool here started from nothing&mdash;from the absolute zero of an empty directory and a blinking cursor. The extraordinary thing is not that AI can write code. Calculators can calculate; that&rsquo;s not remarkable. The extraordinary thing is the collaboration&mdash;the strange, productive dialogue between human intent and machine capability.</p>
-              <p>We are not replaced. We are amplified. The garden still needs a gardener who knows what to plant. The mortgage still needs a human who understands what home means. The mushrooms still need someone willing to get their hands dirty.</p>
-              <p>The machines just help us get there faster, with fewer typos.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Contact -->
-    <section class="section section--contact" id="contact" aria-labelledby="contact-heading">
-      <div class="section__container">
-        <div class="contact__layout">
-          <h2 class="section__heading" id="contact-heading">Say Hello</h2>
-          <p class="contact__text">The best conversations start with a simple hello. Or, if you prefer, with a detailed YAML specification.</p>
-          <div class="contact__links">
-            <a href="https://github.com/harteWired" class="btn btn--primary" target="_blank" rel="noopener noreferrer">GitHub</a>
-            <a href="https://github.com/harteWired/web-design-pipeline" class="btn btn--ghost" target="_blank" rel="noopener noreferrer">View Source</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
+    </div>
   </main>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer__container">
-      <p class="footer__text">Built by <a href="https://github.com/harteWired" target="_blank" rel="noopener noreferrer">harteWired</a> &times; Claude Code</p>
-      <p class="footer__meta">This page was generated by the <a href="https://github.com/harteWired/web-design-pipeline" target="_blank" rel="noopener noreferrer">Web Design Pipeline</a>&mdash;a tool that builds itself.</p>
-    </div>
+  <footer class="footbar" aria-label="Footer">
+    <span>Built by <a href="https://mattharte.com/">Matt Harte</a> using his <a href="https://github.com/harteWired/web-design-pipeline">web-design-pipeline</a></span>
   </footer>
 
-  <!-- SVG grain filter -->
-  <svg class="sr-only" aria-hidden="true">
-    <filter id="grain-filter">
-      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-      <feColorMatrix type="saturate" values="0" />
-    </filter>
-  </svg>
+  <script>
+    // ---- project data ----
+    const PROJECTS = {
+      'text-to-tape':       { name: 'text-to-tape',        body: 'Tell Claude what you want labelled — one jar or fifty cables. It picks the templates, generates the per-label content, shows you the batch, and rolls tape when you say go.', meta1: 'Brother PT-P750W', meta2: 'Live' },
+      'claudelike-bar':     { name: 'claudelike-bar',      body: 'A VS Code sidebar that shows what every Claude Code terminal is doing at a glance. Animated dots, drag-and-drop reordering, context tracking, and a passive-aggressive mode that guilt-trips you when you ignore it.', meta1: 'VS Code', meta2: 'Live' },
+      'belfry':             { name: 'belfry',              body: 'Telegram-to-terminal MUX rigging. Status from N parallel Claude Code sessions fans into one chat; replies route back into the matching session, like you typed them at the prompt.', meta1: 'Node CLI', meta2: 'Live' },
+      'mortgage-viz':       { name: 'mortgage-viz',        body: 'Interactive mortgage payment heatmap with amortization schedules, affordability overlays, and scenario comparison — turning opaque financial math into tactile visual understanding.', meta1: 'React + D3', meta2: 'Live' },
+      'ai-3d-modeling':     { name: 'ai 3d-modeling',      body: 'Claude drafts parts from plain English — parametric in OpenSCAD, assemblies in Fusion, renders in Blender — validated automatically against structural and printability checks. Hands-free CAD.', meta1: 'OpenSCAD · Fusion · Blender', meta2: 'GitHub' },
+      'mushroom-controller':{ name: 'mushroom controller', body: 'Full AI-native design — hardware, firmware, web app, Home Assistant integration — and a build guide for an automated Martha-tent fruiting chamber. From off-the-shelf circuit modules to oyster harvest.', meta1: 'ESP32 · IoT', meta2: 'Build guide' },
+    };
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/SplitText.min.js"></script>
-  <script src="script.js"></script>
+    // ---- cursor spotlight ----
+    (function() {
+      var spot = document.querySelector('.cursor-spotlight');
+      if (!spot) return;
+      var raf = null, x = 0, y = 0;
+      function paint() { spot.style.transform = 'translate(' + (x | 0) + 'px, ' + (y | 0) + 'px) translate(-50%, -50%)'; raf = null; }
+      window.addEventListener('pointermove', function(e) { x = e.clientX; y = e.clientY; if (!raf) raf = requestAnimationFrame(paint); }, { passive: true });
+    })();
 
+    // ---- routing: build per-tile paths from dot to card outline ----
+    (function() {
+      const stage = document.getElementById('stage');
+      const card = document.getElementById('card');
+      const svg = document.getElementById('routing');
+      const tiles = Array.from(document.querySelectorAll('.tile'));
+      const SVGNS = 'http://www.w3.org/2000/svg';
+
+      // map of tile.dataset.key -> { static: [paths], stubs: [paths], geometry: {...} }
+      const tileData = new Map();
+      let activeKey = null;
+
+      // Build an SVG path with given d, delay, accent. Draw duration scales
+      // with path length so every bolt grows at a consistent perceived speed.
+      // Tuned faster (~60% of previous) so the description appears sooner.
+      function makePath(d, delay, accent, opt) {
+        const o = opt || {};
+        const p = document.createElementNS(SVGNS, 'path');
+        p.setAttribute('d', d);
+        p.style.setProperty('--accent', accent);
+        svg.appendChild(p);
+        const len = p.getTotalLength();
+        const drawMs = (typeof o.drawMs === 'number')
+          ? o.drawMs
+          : Math.max(o.minDrawMs || 100, Math.min(o.maxDrawMs || 420, Math.round(len * 0.85)));
+        p.style.transitionProperty = 'stroke-dashoffset, opacity, stroke-width, filter';
+        p.style.transitionDuration = drawMs + 'ms, 110ms, 130ms, 130ms';
+        p.style.transitionDelay = delay + 'ms, 0ms, 0ms, 0ms';
+        p.style.transitionTimingFunction = 'cubic-bezier(0.22, 0.6, 0.36, 1), ease, cubic-bezier(0.16, 1, 0.3, 1), ease';
+        p.style.strokeDasharray = len;
+        p.style.strokeDashoffset = len;
+        return { el: p, len: len, drawMs: drawMs };
+      }
+
+      // Underline-launch trunk: dot -> down -> right (underlining the row),
+      // ending at the fork point just past the right edge of the tile.
+      // This is the only deterministic, "clean" path — everything else is
+      // chaotic lightning forking from the fork point.
+      function underlineTrunk(dx, dy, underY, forkX) {
+        return `M ${dx} ${dy} L ${dx} ${underY} L ${forkX} ${underY}`;
+      }
+
+      // ── Lightning-tree generator (random midpoint displacement + recursive
+      //    binary forking). Algorithm:
+      //   1. Subdivide the line from start to end by inserting a midpoint
+      //      perpendicularly displaced by a random amount.
+      //   2. Recurse on each half with displacement halved.
+      //   3. At any sub-segment with depth < maxDepth, with probability
+      //      `branchProb` (decaying with depth), spawn a fork — a separate
+      //      lightning tree from that midpoint to a random offshoot endpoint.
+      //   4. Each segment carries `delay` so its draw-out begins when the
+      //      parent segment completes — the bolt visibly grows from origin.
+      //
+      // Returns: array of { p1, p2, delay, drawMs, isMain } edges.
+      function buildLightningTree(start, end, opt, baseDelay) {
+        baseDelay = baseDelay || 0;
+        const o = Object.assign({
+          subdivisions: 4,        // depth of midpoint displacement (2^n segments)
+          displacement: 22,       // initial perpendicular jitter; halves each level
+          branchProb: 0.22,       // chance of forking at each midpoint
+          subBranchFactor: 0.45,  // branchProb multiplier for forks (decay)
+          drawSpeed: 1.6,         // ms per pixel of segment length
+          drawMin: 18,            // min ms for any one segment
+          drawMax: 90,            // max ms cap
+          maxDepth: 3,            // how deep recursion of forks goes
+          forkLengthFactor: 0.45, // fork length as fraction of parent total
+          forkAngleSpread: Math.PI / 3,  // ± angular spread for fork direction
+          avoidRect: null,
+          isMain: true,
+          depth: 0,
+        }, opt || {});
+
+        // 1. Generate jagged main chain via midpoint displacement
+        let points = [start, end];
+        let disp = o.displacement;
+        for (let i = 0; i < o.subdivisions; i++) {
+          const next = [];
+          for (let j = 0; j < points.length - 1; j++) {
+            const a = points[j], b = points[j + 1];
+            next.push(a);
+            const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+            const dx = b.x - a.x, dy = b.y - a.y;
+            const len = Math.hypot(dx, dy) || 1;
+            const px = -dy / len, py = dx / len;
+            const k = (Math.random() * 2 - 1) * disp;
+            next.push({ x: mx + px * k, y: my + py * k });
+          }
+          next.push(points[points.length - 1]);
+          points = next;
+          disp *= 0.5;
+        }
+
+        // 2. Convert chain into edges with cumulative delay so the trunk
+        //    visibly grows from origin to destination.
+        const edges = [];
+        let t = baseDelay;
+        for (let i = 0; i < points.length - 1; i++) {
+          const a = points[i], b = points[i + 1];
+          // honour avoidRect for non-main branches: stop the chain before
+          // the next endpoint enters the forbidden zone.
+          if (!o.isMain && o.avoidRect) {
+            const r = o.avoidRect;
+            if (b.x >= r.x1 - 2 && b.x <= r.x2 + 2 && b.y >= r.y1 - 2 && b.y <= r.y2 + 2) break;
+          }
+          const segLen = Math.hypot(b.x - a.x, b.y - a.y);
+          const drawMs = Math.max(o.drawMin, Math.min(o.drawMax, segLen * o.drawSpeed));
+          edges.push({ p1: a, p2: b, delay: t, drawMs: drawMs, isMain: o.isMain });
+          t += drawMs * 0.8; // overlap a touch — feels like a continuous bolt growing
+
+          // 3. Fork? Decay branchProb with depth so density doesn't explode.
+          if (o.depth < o.maxDepth && i > 0 && i < points.length - 2 && Math.random() < o.branchProb) {
+            // pick fork direction: roughly perpendicular-ish to the trunk's
+            // current heading, but biased to keep heading vaguely toward end
+            const trunkAng = Math.atan2(end.y - start.y, end.x - start.x);
+            const sideSign = Math.random() < 0.5 ? -1 : 1;
+            const forkAng = trunkAng + sideSign * (Math.PI / 5 + Math.random() * o.forkAngleSpread);
+            const totalLen = Math.hypot(end.x - start.x, end.y - start.y);
+            const forkLen = totalLen * (o.forkLengthFactor * (0.6 + Math.random() * 0.8));
+            const forkEnd = {
+              x: a.x + Math.cos(forkAng) * forkLen,
+              y: a.y + Math.sin(forkAng) * forkLen,
+            };
+            const subEdges = buildLightningTree(a, forkEnd, {
+              subdivisions: Math.max(2, o.subdivisions - 1),
+              displacement: o.displacement * 0.6,
+              branchProb: o.branchProb * o.subBranchFactor,
+              subBranchFactor: o.subBranchFactor,
+              drawSpeed: o.drawSpeed,
+              drawMin: o.drawMin,
+              drawMax: o.drawMax,
+              maxDepth: o.maxDepth,
+              forkLengthFactor: o.forkLengthFactor * 0.65,
+              forkAngleSpread: o.forkAngleSpread,
+              avoidRect: o.avoidRect,
+              isMain: false,
+              depth: o.depth + 1,
+            }, t - drawMs * 0.8); // branch starts when its origin segment starts drawing
+            edges.push.apply(edges, subEdges);
+          }
+        }
+
+        return edges;
+      }
+
+      function buildStaticPaths() {
+        // wipe everything
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+        tileData.clear();
+
+        const stageRect = stage.getBoundingClientRect();
+        svg.setAttribute('viewBox', `0 0 ${stageRect.width} ${stageRect.height}`);
+        svg.setAttribute('width', stageRect.width);
+        svg.setAttribute('height', stageRect.height);
+        svg.style.width = stageRect.width + 'px';
+        svg.style.height = stageRect.height + 'px';
+
+        const cardRect = card.getBoundingClientRect();
+        const cx1 = cardRect.left  - stageRect.left;
+        const cy1 = cardRect.top   - stageRect.top;
+        const cx2 = cardRect.right - stageRect.left;
+        const cy2 = cardRect.bottom - stageRect.top;
+        const cyMid = (cy1 + cy2) / 2;
+
+        tiles.forEach(function(tile) {
+          const key = tile.dataset.key;
+          const tileRect = tile.getBoundingClientRect();
+          // Lightning emerges from the centre of the colored dot.
+          const dot = tile.querySelector('.tile__dot');
+          const dotRect = dot ? dot.getBoundingClientRect() : tileRect;
+          const dx = dotRect.left - stageRect.left + dotRect.width  / 2;
+          const dy = dotRect.top  - stageRect.top  + dotRect.height / 2;
+          const tileTop    = tileRect.top    - stageRect.top;
+          const tileBottom = tileRect.bottom - stageRect.top;
+          const accent = getComputedStyle(tile).getPropertyValue('--accent').trim() || 'var(--color-accent-primary)';
+
+          const tileLeft  = tileRect.left  - stageRect.left;
+          const tileRight = tileRect.right - stageRect.left;
+
+          // Underline lives BETWEEN the text and the tile divider (border-top
+          // of the next row sits at tileBottom). Y placed inside the bottom
+          // padding so the line reads as an underline, not as a separator.
+          const underY = tileBottom - 5;
+          // Fork point sits just past the right edge of the tile.
+          const forkX  = tileRight  + 12;
+
+          // Card bbox is intentionally NOT cached here. It changes the moment
+          // the card's textContent is populated on hover (h3/p/div elements
+          // gain real height). buildDynamicPaths measures it fresh each time
+          // so the box outline matches the actual rendered card.
+          const geometry = { dx, dy, underY, forkX, accent, tileTop, tileBottom, tileLeft, tileRight };
+
+          tileData.set(key, { geometry, staticPaths: [], dynamic: [] });
+        });
+      }
+
+      // Lightning physics (visual model):
+      //  Phase 1 — underline launch: dot draws down + right under the title row,
+      //            ending at a fork point.
+      //  Phase 2 — stepped leaders: ~14-20 thin, faint branches sprout from
+      //            the fork and grow simultaneously, each taking a chaotic
+      //            random walk biased loosely toward the destination box.
+      //            Most don't connect. One pre-determined "winner" path takes
+      //            a slightly straighter route and arrives at the box first.
+      //  Phase 3 — return stroke: when the winner connects, all the failed
+      //            leaders fade out and the winner channel brightens
+      //            dramatically (thicker stroke + stronger glow).
+      //  Phase 4 — destination: the box outline draws (single closed rect).
+      //  Phase 5 — content: subtle bg fades in, then the text fades in.
+      let pulseTimers = [];
+      function clearPulse() {
+        pulseTimers.forEach(function(t) { clearTimeout(t); });
+        pulseTimers = [];
+      }
+      function buildDynamicPaths(key) {
+        const data = tileData.get(key);
+        if (!data) return;
+        data.dynamic.forEach(function(p) { if (p.el && p.el.parentNode) p.el.parentNode.removeChild(p.el); });
+        data.dynamic = [];
+        clearPulse();
+
+        const g = data.geometry;
+        const a = g.accent;
+
+        // Measure the card NOW (after textContent is populated on hover) —
+        // the bbox depends on the rendered text height. Computing fresh
+        // here is what keeps the box outline tight around the real tile.
+        const stageRect = stage.getBoundingClientRect();
+        const cardRect  = card.getBoundingClientRect();
+        const cx1 = cardRect.left   - stageRect.left;
+        const cy1 = cardRect.top    - stageRect.top;
+        const cx2 = cardRect.right  - stageRect.left;
+        const cy2 = cardRect.bottom - stageRect.top;
+        const boxPad = 10;
+        const bx1 = cx1 - boxPad, by1 = cy1 - boxPad;
+        const bx2 = cx2 + boxPad, by2 = cy2 + boxPad;
+        const boxRect = { x1: bx1, y1: by1, x2: bx2, y2: by2 };
+
+        // Track the main path in route order. Each entry stores the moment
+        // the segment FINISHES drawing — that's when its pulse fires, so
+        // the line-weight wave rides directly behind the drawing wave with
+        // no perceptible gap.
+        const mainSeq = [];
+
+        // ── Phase 1 ── underline launch — starts at the CENTER of the dot
+        // so the line visibly emerges from the source, not from below it.
+        const launchD = underlineTrunk(g.dx, g.dy, g.underY, g.forkX);
+        const launch = makePath(launchD, 0, a);
+        launch.el.classList.add('persistent');
+        data.dynamic.push(launch);
+        mainSeq.push({ p: launch, drawComplete: launch.drawMs });
+
+        const treeStart = 80;  // tree starts when underline arrives at fork
+
+        // ── Phase 2 ── one lightning tree from fork point to a strike point
+        // on the left edge of the box outline. Trunk = main path the eye
+        // follows. Forks = thin background witnesses, can't enter the outline.
+        const strikeY = by1 + (by2 - by1) * (0.25 + Math.random() * 0.5);
+        const treeEdges = buildLightningTree(
+          { x: g.forkX, y: g.underY },
+          { x: bx1,     y: strikeY  },
+          {
+            subdivisions: 4,
+            displacement: 30,
+            branchProb: 0.46,
+            subBranchFactor: 0.55,
+            drawSpeed: 0.58,         // ≈60% of previous 0.95
+            drawMin: 8,
+            drawMax: 32,
+            maxDepth: 4,
+            forkLengthFactor: 0.42,
+            forkAngleSpread: Math.PI / 3,
+            avoidRect: boxRect,
+            isMain: true,
+            depth: 0,
+          },
+          treeStart
+        );
+
+        // Each edge gets its own SVG path so the trunk visibly propagates.
+        // Trunk segments = "main-seg" (uniform thick line). Forks = "leader"
+        // (thin, dim background). The main-seg paths are appended to mainSeq
+        // in their draw order so the pulse wave hits them sequentially.
+        let lastMainCompletion = treeStart;
+        treeEdges.forEach(function(e) {
+          const d = `M ${e.p1.x} ${e.p1.y} L ${e.p2.x} ${e.p2.y}`;
+          const p = makePath(d, e.delay, a, { drawMs: e.drawMs });
+          p.el.classList.add(e.isMain ? 'main-seg' : 'leader');
+          data.dynamic.push(p);
+          if (e.isMain) {
+            const completion = e.delay + e.drawMs;
+            mainSeq.push({ p: p, drawComplete: completion });
+            if (completion > lastMainCompletion) lastMainCompletion = completion;
+          }
+        });
+
+        // ── Phase 3 ── destination box. The path STARTS at the trunk's
+        // strike point and traces continuously around the full tile, returning
+        // to the strike point. With the box's delay = trunk completion, the
+        // line keeps drawing without a gap: dot → underline → bolt → around.
+        const sx = bx1, sy = strikeY;
+        const boxD = `M ${sx} ${sy} L ${bx1} ${by1} L ${bx2} ${by1} L ${bx2} ${by2} L ${bx1} ${by2} L ${sx} ${sy}`;
+        const boxDelay = lastMainCompletion;
+        const boxDrawMs = 200;
+        const box = makePath(boxD, boxDelay, a, { drawMs: boxDrawMs });
+        box.el.classList.add('persistent', 'box-outline');
+        data.dynamic.push(box);
+        const boxCompletion = boxDelay + boxDrawMs;
+        mainSeq.push({ p: box, drawComplete: boxCompletion });
+
+        data.mainSeq = mainSeq;
+        data.boxStart = boxDelay;
+        data.boxCompletion = boxCompletion;
+        data.pulseSettle = 130;  // matches the inline stroke-width transition
+      }
+
+      function activate(key) {
+        if (key === activeKey) return;
+        // deactivate previous: retract paths fast (override the inline draw
+        // transition with a uniform 160ms fade-out so long paths don't take
+        // their full draw time to retract).
+        if (activeKey && tileData.has(activeKey)) {
+          const prevData = tileData.get(activeKey);
+          prevData.dynamic.forEach(function(p) {
+            p.el.style.transitionDuration = '110ms, 100ms, 110ms, 110ms';
+            p.el.style.transitionDelay = '0ms, 0ms, 0ms, 0ms';
+            p.el.removeAttribute('data-active');
+            p.el.style.strokeDashoffset = p.len;
+            setTimeout(function() { if (p.el && p.el.parentNode) p.el.parentNode.removeChild(p.el); }, 140);
+          });
+          prevData.dynamic = [];
+          const prev = document.querySelector('.tile.is-active');
+          if (prev) prev.classList.remove('is-active');
+        }
+        activeKey = key;
+
+        if (!key) {
+          stage.removeAttribute('data-active');
+          card.classList.remove('is-active');
+          return;
+        }
+
+        const proj = PROJECTS[key];
+        if (!proj) return;
+        document.getElementById('cardName').textContent = proj.name;
+        document.getElementById('cardBody').textContent = proj.body;
+        document.getElementById('cardMeta1').textContent = proj.meta1;
+        document.getElementById('cardMeta2').textContent = proj.meta2;
+        const tile = document.querySelector('.tile[data-key="' + key + '"]');
+        if (tile) {
+          tile.classList.add('is-active');
+          const accent = getComputedStyle(tile).getPropertyValue('--accent').trim();
+          stage.style.setProperty('--active-accent', accent);
+        }
+        stage.setAttribute('data-active', key);
+        card.classList.add('is-active');
+
+        // generate fresh trunks + stubs + box for this activation, then animate
+        buildDynamicPaths(key);
+        const data = tileData.get(key);
+        if (data) {
+          // Bg fade: starts the moment the trunk strikes the box (=
+          // box-draw start) and ends when the box's pulse completes.
+          // This is the "wrapping around" window — the box grows visible
+          // exactly as the line-weight wave rolls around its outline.
+          const boxStart = data.boxStart || 700;
+          const boxCompletion = data.boxCompletion || (boxStart + 460);
+          const pulseSettle = data.pulseSettle || 260;
+          const pulseEnd = boxCompletion + pulseSettle;  // when box finishes thickening
+          const bgFadeStart = boxStart;
+          const bgFadeDuration = pulseEnd - bgFadeStart;
+          stage.style.setProperty('--bg-delay',    Math.round(bgFadeStart) + 'ms');
+          stage.style.setProperty('--bg-duration', Math.round(bgFadeDuration) + 'ms');
+          stage.style.setProperty('--text-delay',  Math.round(pulseEnd + 36) + 'ms');
+
+          // Phase 1: mark paths data-active in one frame; Phase 2: change
+          // dashoffset to 0 in the NEXT frame so the browser interpolates.
+          requestAnimationFrame(function() {
+            data.dynamic.forEach(function(p) { p.el.setAttribute('data-active', 'true'); });
+            requestAnimationFrame(function() {
+              data.dynamic.forEach(function(p) { p.el.style.strokeDashoffset = '0'; });
+            });
+          });
+
+          // Each main-path element gets `.pulsed` exactly when it FINISHES
+          // drawing, so the thickening wave rides directly behind the
+          // drawing wave with no gap. Underline thickens at ~140ms, each
+          // trunk segment thickens right after its draw, the box thickens
+          // immediately after its outline closes.
+          if (data.mainSeq) {
+            data.mainSeq.forEach(function(item) {
+              const t = setTimeout(function() {
+                if (activeKey !== key) return;
+                item.p.el.classList.add('pulsed');
+              }, Math.round(item.drawComplete));
+              pulseTimers.push(t);
+            });
+          }
+        }
+      }
+
+      tiles.forEach(function(tile) {
+        tile.addEventListener('mouseenter', function() { activate(tile.dataset.key); });
+        tile.addEventListener('focus',      function() { activate(tile.dataset.key); });
+        // Mobile: tap to expand inline detail; tap again (or another tile)
+        // to collapse. Detail content is built from PROJECTS on first expand.
+        tile.addEventListener('click', function(e) {
+          if (!window.matchMedia('(max-width: 900px)').matches) return;
+          e.preventDefault();
+          const item = tile.closest('.tile-item');
+          if (!item) return;
+          const wasExpanded = item.classList.contains('is-expanded');
+          // collapse other items
+          document.querySelectorAll('.tile-item.is-expanded').forEach(function(other) {
+            if (other !== item) other.classList.remove('is-expanded');
+          });
+          if (wasExpanded) {
+            item.classList.remove('is-expanded');
+            return;
+          }
+          // build detail if not already built
+          let detail = item.querySelector('.tile-detail');
+          if (!detail) {
+            const proj = PROJECTS[tile.dataset.key];
+            if (!proj) return;
+            detail = document.createElement('div');
+            detail.className = 'tile-detail';
+            const inner = document.createElement('div');
+            inner.className = 'tile-detail__inner';
+            inner.innerHTML =
+              '<p class="tile-detail__body">' + proj.body + '</p>' +
+              '<p class="tile-detail__meta">' + proj.meta1 + ' · ' + proj.meta2 + '</p>' +
+              '<a class="tile-detail__visit" href="' + tile.getAttribute('href') + '">Visit &rarr;</a>';
+            detail.appendChild(inner);
+            item.appendChild(detail);
+          }
+          item.classList.add('is-expanded');
+        });
+      });
+      const tilesEl = document.getElementById('tiles');
+      tilesEl.addEventListener('mouseleave', function() { activate(null); });
+
+      // Build static (geometry only) on load + after fonts settle + on resize.
+      function rebuild() { buildStaticPaths(); }
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(rebuild);
+      }
+      window.addEventListener('load', rebuild);
+      let resizeRaf = null;
+      window.addEventListener('resize', function() {
+        if (resizeRaf) cancelAnimationFrame(resizeRaf);
+        resizeRaf = requestAnimationFrame(function() {
+          activate(null);
+          rebuild();
+        });
+      });
+      rebuild();
+    })();
+  </script>
 </body>
 </html>
