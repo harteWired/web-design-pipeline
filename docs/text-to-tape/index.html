@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Talk to your label maker — Matt Harte's Lab</title>
+  <meta name="description" content="Describe one label or fifty. Claude picks the templates, generates per-label content from your prompt, shows you the batch, and rolls tape when you say go. A natural-language label engine for the Brother PT-P750W.">
+
+  <link rel="canonical" href="https://lab.mattharte.com/text-to-tape/">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://lab.mattharte.com/text-to-tape/">
+  <meta property="og:title" content="Talk to your label maker — Matt Harte's Lab">
+  <meta property="og:description" content="Describe a label in plain English from your phone or your editor. Claude picks the template, you confirm, the tape comes out.">
+  <meta property="og:site_name" content="Matt Harte's Lab">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Talk to your label maker">
+  <meta name="twitter:description" content="A label engine you drive in plain English. Brother PT-P750W and siblings.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+
+  <style>
+    /* SHELL_VERSION: 1.1.0 */
+    :root {
+      --color-ink:    oklch(0.13 0.015 270);
+      --color-cream:  oklch(0.93 0.01 90);
+      --color-ember:  oklch(0.78 0.14 55);
+      --color-sage:   oklch(0.72 0.12 165);
+      --color-iris:   oklch(0.45 0.12 290);
+      --color-clay:   oklch(0.59 0.13 35);
+      --color-onyx:   oklch(0.17 0.012 270);
+      --color-slate:  oklch(0.21 0.01 270);
+      --color-pewter: oklch(0.40 0.022 270);
+      --color-mist:   oklch(0.60 0.02 270);
+      --color-linen:  oklch(0.74 0.012 90);
+      --color-bone:   oklch(0.84 0.014 90);
+      --color-fern:    oklch(0.55 0.13 140);
+      --color-saffron: oklch(0.79 0.16 80);
+      --color-garnet:  oklch(0.50 0.18 18);
+      --color-sky:     oklch(0.61 0.12 245);
+
+      --color-bg-base: var(--color-ink);
+      --color-bg-surface: var(--color-onyx);
+      --color-bg-elevated: var(--color-slate);
+      --color-fg-base: var(--color-cream);
+      --color-fg-muted: var(--color-mist);
+      --color-fg-subtle: oklch(0.58 0.015 270);
+      --color-accent-primary: var(--color-ember);
+      --color-accent-secondary: var(--color-sage);
+      --color-accent-glow: oklch(0.78 0.14 55 / 0.15);
+
+      --font-heading: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-weight-heading: 700;
+      --font-weight-body: 400;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+
+      --text-sm: 0.75rem;
+      --text-base: 1rem;
+      --text-1: 1.333rem;
+      --text-2: 1.777rem;
+      --text-3: 2.369rem;
+      --text-4: 3.157rem;
+      --text-5: 4.209rem;
+      --text-6: 5.61rem;
+      --font-size-hero: clamp(2.5rem, 5vw + 1rem, var(--text-6));
+      --line-height-body: 1.65;
+      --line-height-heading: 1.1;
+      --letter-spacing-overline: 0.12em;
+
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+      --space-section: clamp(4rem, 10vh, 8rem);
+
+      --grid-max-width: 1280px;
+      --grid-margin: clamp(1.5rem, 5vw, 4rem);
+      --grid-gap: 1.5rem;
+
+      --ease-dramatic: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-entrance: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+      --duration-micro: 200ms;
+      --duration-hover: 280ms;
+      --duration-entrance: 700ms;
+      --duration-hero: 1200ms;
+      --stagger-delay: 70ms;
+
+      --shadow-sm: 0 1px 3px oklch(0 0 0 / 0.3);
+      --shadow-md: 0 8px 24px oklch(0 0 0 / 0.4);
+      --shadow-lg: 0 16px 48px oklch(0 0 0 / 0.5);
+
+      --radius-sm: 0.25rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --border-subtle: 1px solid oklch(1 0 0 / 0.06);
+
+      --z-bg-effect: -1;
+      --z-base: 1;
+      --z-nav: 100;
+      --z-overlay: 500;
+
+      --bg-effect-opacity: 0.35;
+      --cursor-spotlight-size: 600px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: auto; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow-x: clip; }
+    body { font-family: var(--font-body); font-weight: var(--font-weight-body); font-size: var(--text-base); line-height: var(--line-height-body); color: var(--color-fg-base); background-color: var(--color-bg-base); overflow-x: clip; }
+    img, svg, video { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    ul, ol { list-style: none; }
+    button { font: inherit; cursor: pointer; }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    .skip-link { position: fixed; top: var(--space-md); left: var(--space-md); z-index: calc(var(--z-overlay) + 100); padding: var(--space-sm) var(--space-md); background: var(--color-accent-primary); color: var(--color-bg-base); font-family: var(--font-body); font-weight: var(--font-weight-semibold); font-size: var(--text-sm); border-radius: var(--radius-sm); transform: translateY(-200%); transition: transform var(--duration-micro) var(--ease-standard); }
+    .skip-link:focus { transform: translateY(0); }
+
+    /* No mix-blend-mode (Firefox/Windows CPU compositing flicker). Lower opacity gives a similar feel. */
+    .grain { position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.08; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 256px 256px; }
+    .cursor-spotlight { position: fixed; top: 0; left: 0; width: var(--cursor-spotlight-size); height: var(--cursor-spotlight-size); border-radius: 50%; background: radial-gradient(circle, var(--color-accent-glow) 0%, transparent 70%); pointer-events: none; z-index: var(--z-bg-effect); opacity: 0; transform: translate(-50%, -50%); transition: opacity var(--duration-entrance) var(--ease-standard); }
+    body:hover .cursor-spotlight { opacity: 1; }
+
+    /* Pre-rasterized ambient gradient (shared with parent lab via absolute path).
+       filter:blur on a position:fixed SVG with animated `d` attribute is a Firefox
+       WebRender flicker source — pre-rasterizing collapses it to one cached GPU layer. */
+    .morphing-blobs { position: fixed; inset: 0; z-index: -1; pointer-events: none; background-image: url('/assets/blobs-bg.png'); background-size: cover; background-position: center; background-repeat: no-repeat; }
+
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: var(--z-nav); padding: var(--space-lg) var(--grid-margin); transition: background-color var(--duration-hover) var(--ease-standard), padding var(--duration-hover) var(--ease-standard), backdrop-filter var(--duration-hover) var(--ease-standard); }
+    /* Solid bg instead of backdrop-filter:blur — Bugzilla 1718471 (Firefox) */
+    .nav--scrolled { padding-block: var(--space-md); background-color: oklch(0.13 0.015 270 / 0.95); border-bottom: var(--border-subtle); }
+    .nav nav { display: flex; align-items: center; justify-content: space-between; max-width: var(--grid-max-width); margin-inline: auto; }
+    .nav__logo { display: flex; align-items: center; gap: var(--space-sm); font-family: var(--font-mono); font-size: var(--text-1); font-weight: var(--font-weight-semibold); color: var(--color-accent-primary); letter-spacing: -0.02em; }
+    .nav__rabbit { width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 0 8px oklch(0.72 0.12 165 / 0.4)); }
+    .nav__links { display: flex; gap: var(--space-xl); }
+    .nav__link { font-size: var(--text-sm); font-weight: var(--font-weight-medium); color: var(--color-fg-muted); text-transform: uppercase; letter-spacing: var(--letter-spacing-overline); transition: color var(--duration-micro) var(--ease-standard); position: relative; }
+    .nav__link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--color-accent-primary); transition: width var(--duration-hover) var(--ease-dramatic); }
+    .nav__link:hover, .nav__link:focus-visible { color: var(--color-fg-base); }
+    .nav__link:hover::after, .nav__link:focus-visible::after { width: 100%; }
+    @media (max-width: 720px) { .nav__links { display: none; } }
+
+    .btn { display: inline-flex; align-items: center; gap: var(--space-sm); padding: var(--space-md) var(--space-xl); font-family: var(--font-body); font-size: var(--text-sm); font-weight: var(--font-weight-semibold); text-transform: uppercase; letter-spacing: var(--letter-spacing-overline); border-radius: var(--radius-sm); border: 1px solid transparent; cursor: pointer; transition: transform var(--duration-hover) var(--ease-dramatic), box-shadow var(--duration-hover) var(--ease-dramatic), background-color var(--duration-hover) var(--ease-standard), color var(--duration-hover) var(--ease-standard), border-color var(--duration-hover) var(--ease-standard); }
+    .btn--primary { background: var(--color-accent-primary); color: var(--color-bg-base); border-color: var(--color-accent-primary); }
+    .btn--primary:hover, .btn--primary:focus-visible { transform: translateY(-2px); box-shadow: 0 4px 20px var(--color-accent-glow); }
+    .btn--ghost { background: transparent; color: var(--color-fg-muted); border-color: var(--color-fg-subtle); }
+    .btn--ghost:hover, .btn--ghost:focus-visible { color: var(--color-fg-base); border-color: var(--color-fg-muted); transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); }
+    .btn:focus-visible { outline: 2px solid var(--color-accent-primary); outline-offset: 2px; }
+
+    .section { padding: var(--space-section) var(--grid-margin); position: relative; }
+    .section__container { max-width: var(--grid-max-width); margin-inline: auto; }
+    .section__header { margin-bottom: var(--space-3xl); }
+    .section__overline { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-accent-primary); text-transform: uppercase; letter-spacing: var(--letter-spacing-overline); margin-bottom: var(--space-md); }
+    .section__heading { font-family: var(--font-heading); font-size: clamp(var(--text-3), 4vw, var(--text-5)); font-weight: var(--font-weight-heading); line-height: var(--line-height-heading); color: var(--color-fg-base); margin-bottom: var(--space-md); }
+    .section__description { font-size: var(--text-1); color: var(--color-fg-muted); max-width: 40rem; }
+    .section--surface { background: var(--color-bg-surface); border-top: var(--border-subtle); border-bottom: var(--border-subtle); }
+
+    /* will-change promotes each reveal target to its own GPU layer for its single fade-up;
+       the JS clears it on transitionend (is-settled class) so layers don't pile up. */
+    .js .reveal { opacity: 0; transform: translateY(24px); transition: opacity var(--duration-entrance) var(--ease-entrance), transform var(--duration-entrance) var(--ease-entrance); will-change: opacity, transform; }
+    .js .reveal.is-visible { opacity: 1; transform: none; }
+    .js .reveal.is-settled { will-change: auto; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+      .js .reveal { opacity: 1; transform: none; }
+      .cursor-spotlight { display: none; }
+      .morphing-blobs__blob--0, .morphing-blobs__blob--1, .morphing-blobs__blob--2 { animation: none !important; }
+    }
+
+    /* ---- page-specific CSS below this line ---- */
+
+    /* HERO */
+    .hero { position: relative; min-height: 100svh; display: flex; align-items: center; padding: calc(var(--space-3xl) + var(--space-xl)) var(--grid-margin) var(--space-3xl); overflow: hidden; }
+    .hero__container { max-width: var(--grid-max-width); margin-inline: auto; width: 100%; display: grid; grid-template-columns: 1.05fr 0.95fr; gap: var(--space-2xl); align-items: center; }
+    .hero__content { position: relative; z-index: 2; }
+    .hero__overline { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-accent-primary); text-transform: uppercase; letter-spacing: var(--letter-spacing-overline); margin-bottom: var(--space-lg); }
+    .hero__overline::before { content: '/'; color: var(--color-fg-subtle); margin-right: var(--space-sm); }
+    .hero__headline { font-family: var(--font-heading); font-size: var(--font-size-hero); font-weight: var(--font-weight-heading); line-height: 0.95; color: var(--color-fg-base); margin-bottom: var(--space-lg); letter-spacing: -0.02em; }
+    .hero__headline em { font-style: italic; color: var(--color-accent-primary); }
+    .hero__subhead { font-size: var(--text-1); color: var(--color-fg-muted); max-width: 36rem; margin-bottom: var(--space-xl); }
+    .hero__subhead code { font-family: var(--font-mono); font-size: 0.92em; color: var(--color-fg-base); background: var(--color-bg-surface); padding: 0.1em 0.45em; border-radius: var(--radius-sm); border: var(--border-subtle); }
+    .hero__subhead strong { color: var(--color-accent-primary); font-weight: var(--font-weight-semibold); }
+    .hero__cta { display: flex; gap: var(--space-md); flex-wrap: wrap; align-items: center; }
+    .hero__meta { margin-top: var(--space-xl); display: flex; gap: var(--space-lg); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-fg-subtle); flex-wrap: wrap; }
+    .hero__meta span { display: inline-flex; align-items: center; gap: var(--space-xs); }
+    .hero__meta strong { color: var(--color-fg-muted); font-weight: var(--font-weight-medium); }
+
+    .hero__visual { position: relative; aspect-ratio: 1; max-width: 480px; justify-self: center; width: 100%; }
+    .hero__rings { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .hero__rabbit { position: absolute; inset: 0; margin: auto; width: 60%; height: 60%; object-fit: contain; filter: drop-shadow(0 0 60px oklch(0.78 0.14 55 / 0.18)); opacity: 0.92; z-index: 1; }
+    /* hero tape strips drift across the visual */
+    /* Tape strips: static (no drift animation), real border instead of outline-style box-shadow.
+       Rotating transform + `box-shadow: 0 0 0 1px ...` on Firefox WebRender re-rasterizes the
+       shadow at subpixel-different positions every frame, producing visible flicker around the
+       element edges. Chromium composites differently and doesn't show it. Until we have a better
+       solution, keep tapes still. */
+    .hero__tape { position: absolute; left: 50%; top: 50%; width: 88%; padding: 6px 10px; background: oklch(0.93 0.01 90); color: var(--color-ink); border: 1px solid oklch(0.84 0.014 90); border-radius: 3px; font-family: var(--font-mono); font-size: var(--text-sm); font-weight: var(--font-weight-medium); letter-spacing: 0.04em; box-shadow: 0 4px 14px oklch(0 0 0 / 0.45); transform-origin: center; z-index: 2; }
+    .hero__tape::before, .hero__tape::after { content: ''; position: absolute; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-style: solid; }
+    .hero__tape::before { left: -8px; border-width: 8px 8px 8px 0; border-color: transparent oklch(0.84 0.014 90) transparent transparent; }
+    .hero__tape::after { right: -8px; border-width: 8px 0 8px 8px; border-color: transparent transparent transparent oklch(0.84 0.014 90); }
+    .hero__tape--1 { transform: translate(-50%, -50%) rotate(-7deg) translateY(-112px); }
+    .hero__tape--2 { transform: translate(-50%, -50%) rotate(3deg) translateY(2px); }
+    .hero__tape--3 { transform: translate(-50%, -50%) rotate(-4deg) translateY(112px); }
+
+    @media (max-width: 900px) {
+      .hero { min-height: auto; padding-top: calc(var(--space-3xl) + var(--space-2xl)); }
+      .hero__container { grid-template-columns: 1fr; gap: var(--space-xl); }
+      .hero__visual { order: -1; max-width: 320px; }
+    }
+    /* LAYERS — utility-benefit stack */
+    .layers { display: grid; gap: var(--space-md); }
+    .layer { display: grid; grid-template-columns: 1fr auto; gap: var(--space-lg); align-items: start; padding: var(--space-lg) var(--space-xl); background: var(--color-bg-surface); border: var(--border-subtle); border-radius: var(--radius-md); border-left: 3px solid var(--accent, var(--color-accent-primary)); }
+    .layer:nth-child(1) { --accent: var(--color-ember); }
+    .layer:nth-child(2) { --accent: var(--color-sage); }
+    .layer:nth-child(3) { --accent: var(--color-iris); }
+    .layer:nth-child(4) { --accent: var(--color-clay); }
+    .layer__title { font-family: var(--font-body); font-size: var(--text-1); font-weight: var(--font-weight-semibold); color: var(--color-fg-base); margin-bottom: var(--space-xs); }
+    .layer__body { color: var(--color-fg-muted); font-size: var(--text-base); line-height: 1.55; }
+    .layer__body code { font-family: var(--font-mono); font-size: 0.92em; color: var(--color-fg-base); background: var(--color-bg-elevated); padding: 0.1em 0.4em; border-radius: var(--radius-sm); }
+    .layer__tag { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--accent); text-transform: uppercase; letter-spacing: var(--letter-spacing-overline); white-space: nowrap; padding-top: 0.3em; }
+    @media (max-width: 720px) {
+      .layer { grid-template-columns: 1fr; gap: var(--space-sm); padding: var(--space-md) var(--space-lg); }
+      .layer__tag { order: -1; padding-top: 0; }
+    }
+
+    /* SURFACES — utterance → preview cards */
+    .surfaces { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); }
+    .surface { background: var(--color-bg-surface); border: var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-xl); display: flex; flex-direction: column; gap: var(--space-md); }
+    .surface__quote { font-family: var(--font-heading); font-style: italic; font-size: var(--text-1); line-height: 1.35; color: var(--color-fg-base); position: relative; padding-left: var(--space-md); border-left: 2px solid var(--color-accent-primary); }
+    .surface__strip { background: oklch(0.93 0.01 90); border-radius: var(--radius-sm); padding: var(--space-md); display: grid; place-items: center; min-height: 84px; box-shadow: 0 4px 14px oklch(0 0 0 / 0.25); }
+    .surface__strip img { width: auto; max-width: 100%; max-height: 56px; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
+    /* Batch variant: stack three strips with a slight offset to suggest "many in one go" */
+    .surface__strip--batch { display: flex; flex-direction: column; gap: 4px; padding: var(--space-md) var(--space-md); align-items: stretch; min-height: 110px; position: relative; }
+    .surface__strip--batch img { width: 100%; max-width: 100%; max-height: 24px; object-fit: contain; }
+    .surface__strip--batch::after { content: '+5 more'; position: absolute; right: 10px; bottom: 6px; font-family: var(--font-mono); font-size: 0.65rem; color: var(--color-pewter); letter-spacing: var(--letter-spacing-overline); }
+    .surface__caption { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-fg-subtle); text-align: center; }
+    @media (max-width: 720px) { .surfaces { grid-template-columns: 1fr; } }
+
+    /* GALLERY — preview grid */
+    .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); }
+    .label-card { background: var(--color-bg-surface); border: var(--border-subtle); border-radius: var(--radius-md); overflow: hidden; display: flex; flex-direction: column; }
+    .label-card__strip { background: oklch(0.93 0.01 90); padding: var(--space-md); display: grid; place-items: center; min-height: 90px; }
+    .label-card__strip img { width: auto; max-width: 100%; max-height: 56px; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
+    .label-card__meta { padding: var(--space-md) var(--space-lg); border-top: var(--border-subtle); }
+    .label-card__pack { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-accent-primary); text-transform: uppercase; letter-spacing: var(--letter-spacing-overline); }
+    .label-card__name { font-family: var(--font-body); font-size: var(--text-base); font-weight: var(--font-weight-semibold); color: var(--color-fg-base); margin-top: var(--space-xs); }
+    .label-card__desc { font-size: var(--text-sm); color: var(--color-fg-muted); margin-top: var(--space-xs); }
+    .gallery__cta { margin-top: var(--space-xl); }
+    @media (max-width: 720px) { .gallery { grid-template-columns: 1fr; } }
+
+    /* QUICK START code blocks */
+    .start { display: grid; gap: var(--space-lg); max-width: 56rem; }
+    .start__step { background: var(--color-bg-surface); border: var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-lg) var(--space-xl); }
+    .start__title { font-family: var(--font-body); font-size: var(--text-1); font-weight: var(--font-weight-semibold); color: var(--color-fg-base); margin-bottom: var(--space-sm); }
+    .start__title span { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-accent-primary); margin-right: var(--space-sm); }
+    .start__body { color: var(--color-fg-muted); font-size: var(--text-base); }
+    .start pre { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-fg-base); background: var(--color-bg-elevated); padding: var(--space-md); border-radius: var(--radius-sm); margin-top: var(--space-sm); overflow-x: auto; border: var(--border-subtle); }
+    .start__body code { font-family: var(--font-mono); font-size: 0.92em; color: var(--color-fg-base); background: var(--color-bg-elevated); padding: 0.1em 0.4em; border-radius: var(--radius-sm); }
+
+    /* FOOTER */
+    .footer { padding: var(--space-2xl) var(--grid-margin); border-top: var(--border-subtle); }
+    .footer__container { max-width: var(--grid-max-width); margin-inline: auto; display: flex; justify-content: space-between; gap: var(--space-md); flex-wrap: wrap; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-fg-subtle); }
+    .footer a { color: var(--color-fg-muted); text-decoration: underline; text-decoration-color: oklch(0.78 0.14 55 / 0.4); text-underline-offset: 3px; transition: color var(--duration-micro) var(--ease-standard); }
+    .footer a:hover, .footer a:focus-visible { color: var(--color-accent-primary); }
+
+    /* note banner: this is the lab page, not the demo */
+    .pagebar { padding: var(--space-sm) var(--grid-margin); background: oklch(0.78 0.14 55 / 0.08); border-bottom: var(--border-subtle); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-fg-muted); text-align: center; }
+    .pagebar a { color: var(--color-accent-primary); text-decoration: underline; text-underline-offset: 3px; }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="cursor-spotlight" aria-hidden="true"></div>
+
+  <div class="morphing-blobs" aria-hidden="true"></div>
+
+  <header class="nav">
+    <nav aria-label="Main navigation">
+      <a href="https://github.com/harteWired" class="nav__logo" aria-label="harteWired on GitHub">
+        <img class="nav__rabbit" src="/assets/whiterabbiticon2.png" alt="" width="36" height="36" aria-hidden="true">
+        harteWired
+      </a>
+      <ul class="nav__links">
+        <li><a href="#what" class="nav__link">What</a></li>
+        <li><a href="#layers" class="nav__link">Layers</a></li>
+        <li><a href="#gallery" class="nav__link">Templates</a></li>
+        <li><a href="#start" class="nav__link">Quick start</a></li>
+        <li><a href="https://github.com/harteWired/brother-ptouch-automation" class="nav__link" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="hero__container">
+        <div class="hero__content">
+          <p class="hero__overline">harteWired Lab · brother-ptouch-automation</p>
+          <h1 class="hero__headline" id="hero-heading">Talk to your<br><em>label maker</em>.</h1>
+          <p class="hero__subhead">Tell Claude &mdash; in plain English, from your phone or your editor &mdash; what you need labelled. <strong>One jar or fifty cables.</strong> It picks the templates, generates the per-label text, shows you the whole batch as a preview, and rolls tape when you say go.</p>
+          <div class="hero__cta">
+            <a href="https://hartewired.github.io/brother-ptouch-automation/" class="btn btn--primary" target="_blank" rel="noopener noreferrer">Browse 36 templates <span aria-hidden="true">&rarr;</span></a>
+            <a href="https://github.com/harteWired/brother-ptouch-automation" class="btn btn--ghost" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+          <p class="hero__meta">
+            <span><strong>36</strong> templates ready</span>
+            <span><strong>12</strong> packs</span>
+            <span>Add new ones in <strong>plain text</strong></span>
+            <span>Works on <strong>PT-P750W</strong> &amp; siblings</span>
+          </p>
+        </div>
+        <div class="hero__visual" aria-hidden="true">
+          <svg class="hero__rings" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="300" cy="300" r="60"  fill="none" stroke="oklch(0.78 0.14 55)"  stroke-width="1.4" opacity="0.20"/>
+            <circle cx="300" cy="300" r="120" fill="none" stroke="oklch(0.72 0.12 165)" stroke-width="1.3" opacity="0.16"/>
+            <circle cx="300" cy="300" r="180" fill="none" stroke="oklch(0.78 0.14 55)"  stroke-width="1.2" opacity="0.13"/>
+            <circle cx="300" cy="300" r="240" fill="none" stroke="oklch(0.72 0.12 165)" stroke-width="1.1" opacity="0.10"/>
+            <circle cx="300" cy="300" r="285" fill="none" stroke="oklch(0.78 0.14 55)"  stroke-width="1.0" opacity="0.08"/>
+          </svg>
+          <img class="hero__rabbit" src="/assets/whiterabbiticon2.png" alt="" width="400" height="400" loading="eager">
+          <span class="hero__tape hero__tape--1">PANTRY · oats · 11/26</span>
+          <span class="hero__tape hero__tape--2">CAT6 · ethernet · garage</span>
+          <span class="hero__tape hero__tape--3">PLA · sage · 1.2 kg</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="what" aria-labelledby="what-heading">
+      <div class="section__container">
+        <header class="section__header reveal">
+          <p class="section__overline">Describe one. Or fifty.</p>
+          <h2 class="section__heading" id="what-heading">Talk in batches. Get batches.</h2>
+          <p class="section__description">No GUI. No CSV. No fiddling with font sizes. You describe what you need labelled &mdash; one thing or a whole drawer &mdash; and Claude generates the per-label content, picks the right template, and prepares the batch. You confirm. Tape rolls.</p>
+        </header>
+
+        <div class="surfaces surfaces--utterances">
+          <article class="surface reveal">
+            <p class="surface__quote">&ldquo;Label this jar &lsquo;oats&rsquo;, expires November 2026, with a little wheat icon.&rdquo;</p>
+            <div class="surface__strip"><img src="assets/labels/kitchen_pantry_jar_with_icon_12mm.png" alt="Pantry jar label preview"></div>
+            <p class="surface__caption">1 label &middot; kitchen / pantry_jar &middot; 12 mm</p>
+          </article>
+          <article class="surface surface--batch reveal">
+            <p class="surface__quote">&ldquo;Spice rack: cumin, paprika, oregano, garlic powder, cayenne, turmeric, basil, thyme. Add the 2026 fill date and a wheat icon to each.&rdquo;</p>
+            <div class="surface__strip surface__strip--batch">
+              <img src="assets/labels/kitchen_pantry_jar_with_icon_12mm.png" alt="">
+              <img src="assets/labels/kitchen_pantry_jar_with_icon_12mm.png" alt="">
+              <img src="assets/labels/kitchen_pantry_jar_with_icon_12mm.png" alt="" aria-label="Spice jar batch preview">
+            </div>
+            <p class="surface__caption">8 labels &middot; one batch, one confirmation, eight strips</p>
+          </article>
+          <article class="surface reveal">
+            <p class="surface__quote">&ldquo;Tag every cable behind the desk: HDMI to projector, USB-C to monitor, ethernet to switch, lamp power.&rdquo;</p>
+            <div class="surface__strip"><img src="assets/labels/electronics_cable_flag_12mm.png" alt="Cable flag preview"></div>
+            <p class="surface__caption">4 labels &middot; electronics / cable_flag &middot; wraps sized per cable</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--surface" id="why" aria-labelledby="why-heading">
+      <div class="section__container">
+        <header class="section__header reveal">
+          <p class="section__overline">Why bother</p>
+          <h2 class="section__heading" id="why-heading">Labels by the drawer, not the click.</h2>
+          <p class="section__description">P-touch Editor is a desktop GUI for one-off labels. The moment you need ten of them, or a label triggered from a script, or the same template across rooms &mdash; you're stuck clicking. This is the part that fixes that.</p>
+        </header>
+
+        <div class="layers">
+          <article class="layer reveal">
+            <div>
+              <h3 class="layer__title">Batch a drawer's worth in one prompt</h3>
+              <p class="layer__body">"Label everything in the moving boxes I'm packing this weekend: kitchen-fragile, kitchen-pantry, kitchen-dishes, bathroom-toiletries, bedroom-bedding..." Claude generates the per-label content from your prompt &mdash; including stuff it has to infer, like ordinal numbers, dates, or short descriptions &mdash; picks the right template per item, and shows you the whole batch as a strip preview. You scan it, confirm, the printer rolls.</p>
+            </div>
+            <div class="layer__tag">batch</div>
+          </article>
+          <article class="layer reveal">
+            <div>
+              <h3 class="layer__title">Add a new label type without writing code</h3>
+              <p class="layer__body">Most templates are ~10 lines of plain text in a <code>presets.toml</code> file. Name, fields, layout. Save the file and the new label shows up in Claude, the CLI, and the live demo simultaneously. No Python class, no rebuild.</p>
+            </div>
+            <div class="layer__tag">extend</div>
+          </article>
+          <article class="layer reveal">
+            <div>
+              <h3 class="layer__title">Cable flags that fit the cable</h3>
+              <p class="layer__body">Say "ethernet" or "extension cord" or "24AWG" and the wrap section is sized from the actual outer diameter so it lands cleanly on the jacket. 40+ keywords plus AWG 0&ndash;30 built in &mdash; no measuring tape, no guesswork.</p>
+            </div>
+            <div class="layer__tag">smart</div>
+          </article>
+          <article class="layer reveal">
+            <div>
+              <h3 class="layer__title">The printer never surprises you</h3>
+              <p class="layer__body">Dry-run is the default. Every label renders to a PNG preview before tape moves; you opt in to printing with <code>--send</code> (or by saying so). The engine also reads the printer's status before sending, so it refuses to print a 12 mm label onto loaded 9 mm tape.</p>
+            </div>
+            <div class="layer__tag">safe</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="gallery" aria-labelledby="gallery-heading">
+      <div class="section__container">
+        <header class="section__header reveal">
+          <p class="section__overline">36 templates · 12 packs</p>
+          <h2 class="section__heading" id="gallery-heading">Something for almost every drawer</h2>
+          <p class="section__description">Kitchen, electronics, 3D printing, garden, networking, workshop, home inventory, media, pet, travel, calibration, utility. If a category is missing, you can add it yourself in plain text &mdash; no code.</p>
+        </header>
+
+        <div class="gallery">
+          <article class="label-card reveal">
+            <div class="label-card__strip"><img src="assets/labels/kitchen_pantry_jar_with_icon_12mm.png" alt="Pantry jar label, 12 mm tape, with food icon"></div>
+            <div class="label-card__meta">
+              <p class="label-card__pack">kitchen / pantry_jar</p>
+              <p class="label-card__name">Pantry jar with icon</p>
+              <p class="label-card__desc">Two-line layout, optional Lucide icon, expiry date, 12 mm tape.</p>
+            </div>
+          </article>
+          <article class="label-card reveal">
+            <div class="label-card__strip"><img src="assets/labels/electronics_cable_flag_12mm.png" alt="Cable flag for Cat6 ethernet"></div>
+            <div class="label-card__meta">
+              <p class="label-card__pack">electronics / cable_flag</p>
+              <p class="label-card__name">Wire-aware cable flag</p>
+              <p class="label-card__desc">Wrap section sized to the cable's OD &mdash; <code>ethernet</code>, <code>24AWG</code>, <code>extension-cord</code>, etc.</p>
+            </div>
+          </article>
+          <article class="label-card reveal">
+            <div class="label-card__strip"><img src="assets/labels/three_d_printing_filament_spool_12mm.png" alt="Filament spool label"></div>
+            <div class="label-card__meta">
+              <p class="label-card__pack">three_d_printing / filament_spool</p>
+              <p class="label-card__name">Filament spool</p>
+              <p class="label-card__desc">Material, color, mass remaining; pairs nicely with the spool QR decorator.</p>
+            </div>
+          </article>
+          <article class="label-card reveal">
+            <div class="label-card__strip"><img src="assets/labels/utility_qr_12mm.png" alt="QR-only label"></div>
+            <div class="label-card__meta">
+              <p class="label-card__pack">utility / qr</p>
+              <p class="label-card__name">QR or image, standalone</p>
+              <p class="label-card__desc">Or use <code>--link</code> / <code>--image</code> to snap a QR onto <em>any</em> existing template.</p>
+            </div>
+          </article>
+          <article class="label-card reveal">
+            <div class="label-card__strip"><img src="assets/labels/workshop_hazard_12mm.png" alt="GHS hazard label"></div>
+            <div class="label-card__meta">
+              <p class="label-card__pack">workshop / hazard</p>
+              <p class="label-card__name">GHS hazard pictogram</p>
+              <p class="label-card__desc">Bespoke geometry for the diamond pictogram + signal word + CAS info line.</p>
+            </div>
+          </article>
+          <article class="label-card reveal">
+            <div class="label-card__strip"><img src="assets/labels/electronics_psu_polarity_12mm.png" alt="PSU polarity label"></div>
+            <div class="label-card__meta">
+              <p class="label-card__pack">electronics / psu_polarity</p>
+              <p class="label-card__name">PSU polarity</p>
+              <p class="label-card__desc">Center-positive or center-negative icon, plus voltage / current.</p>
+            </div>
+          </article>
+        </div>
+
+        <p class="gallery__cta reveal"><a href="https://hartewired.github.io/brother-ptouch-automation/" class="btn btn--ghost" target="_blank" rel="noopener noreferrer">See all 36 templates on the demo site <span aria-hidden="true">&rarr;</span></a></p>
+      </div>
+    </section>
+
+    <section class="section section--surface" id="start" aria-labelledby="start-heading">
+      <div class="section__container">
+        <header class="section__header reveal">
+          <p class="section__overline">Five minutes to your first tape</p>
+          <h2 class="section__heading" id="start-heading">Get going</h2>
+          <p class="section__description">Fastest path is the Claude Code skill &mdash; one install, then describe labels in plain English. The CLI is right there too if you'd rather type.</p>
+        </header>
+
+        <div class="start">
+          <div class="start__step reveal">
+            <h3 class="start__title"><span>01</span> Install once</h3>
+            <p class="start__body">From PyPI, with the icon set you want bundled:</p>
+            <pre>pip install "brother-ptouch-automation[lucide]"</pre>
+          </div>
+          <div class="start__step reveal">
+            <h3 class="start__title"><span>02</span> Add the Claude Code skill</h3>
+            <p class="start__body">Drop the bundled <code>label-printer</code> skill into the project where you'll be working &mdash; kitchen inventory, garage cabling, whatever. Now you can describe a single label or a whole batch and Claude generates the per-label content for you:</p>
+            <pre>"Label every spice in the rack with a 2026 fill date and wheat icon."
+"Tag every cable behind the rack with what's on the other end."
+"Label these moving boxes — kitchen, bathroom, bedroom, garage — with
+ a one-line summary of what's inside each, and number them."
+"Print a hazard label for the acetone bottle. GHS class 2."</pre>
+            <p class="start__body" style="margin-top: 0.75rem;">Claude picks the template per item, generates the per-label text (including stuff it has to infer like dates, ordinals, short descriptions), and shows you the whole batch as a strip preview before anything reaches the printer.</p>
+          </div>
+          <div class="start__step reveal">
+            <h3 class="start__title"><span>03</span> Or skip Claude and use the CLI</h3>
+            <p class="start__body">Same engine, same templates. Dry-run by default; add <code>--send</code> when you're ready.</p>
+            <pre>lp print kitchen/pantry_jar name=oats expires=2026-11 --tape 12mm --send</pre>
+          </div>
+          <div class="start__step reveal">
+            <h3 class="start__title"><span>04</span> Invent your own labels</h3>
+            <p class="start__body">If the catalog is missing what you need, drop ~10 lines into a pack's <code>presets.toml</code> &mdash; name, fields, layout. The new template shows up everywhere automatically. <a href="https://github.com/harteWired/brother-ptouch-automation/blob/main/docs/creating-a-preset.md" target="_blank" rel="noopener noreferrer">creating-a-preset.md</a> walks through it.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer__container">
+      <p>Built by <a href="https://github.com/harteWired" target="_blank" rel="noopener noreferrer">harteWired</a> &times; Claude Code</p>
+      <p><a href="https://hartewired.github.io/brother-ptouch-automation/" target="_blank" rel="noopener noreferrer">Live demo (36 templates)</a> &middot; <a href="https://github.com/harteWired/brother-ptouch-automation" target="_blank" rel="noopener noreferrer">Source</a> &middot; <a href="https://lab.mattharte.com/" target="_blank" rel="noopener noreferrer">More from the lab</a></p>
+    </div>
+  </footer>
+
+  <script>
+    document.documentElement.classList.add('js');
+
+    (function() {
+      var spot = document.querySelector('.cursor-spotlight');
+      if (!spot) return;
+      var raf = null, x = 0, y = 0;
+      function paint() { spot.style.transform = 'translate(' + x + 'px, ' + y + 'px) translate(-50%, -50%)'; raf = null; }
+      window.addEventListener('pointermove', function(e) { x = e.clientX; y = e.clientY; if (!raf) raf = requestAnimationFrame(paint); }, { passive: true });
+    })();
+
+    (function() {
+      var nav = document.querySelector('.nav');
+      if (!nav) return;
+      function update() { nav.classList.toggle('nav--scrolled', window.scrollY > 24); }
+      update();
+      window.addEventListener('scroll', update, { passive: true });
+    })();
+
+    (function() {
+      var els = document.querySelectorAll('.reveal');
+      if (!els.length || !('IntersectionObserver' in window)) {
+        els.forEach(function(el) { el.classList.add('is-visible', 'is-settled'); });
+        return;
+      }
+      function settle(e) { if (e.propertyName === 'opacity') { this.classList.add('is-settled'); this.removeEventListener('transitionend', settle); } }
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) {
+            e.target.addEventListener('transitionend', settle);
+            e.target.classList.add('is-visible');
+            io.unobserve(e.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -10% 0px', threshold: 0.05 });
+      els.forEach(function(el) { io.observe(el); });
+    })();
+  </script>
+
+</body>
+</html>
