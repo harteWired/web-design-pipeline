@@ -1,5 +1,7 @@
 # Web Design Pipeline
 
+[![by harteWired](https://img.shields.io/badge/by-harteWired-e6a562?style=flat&labelColor=15151e)](https://github.com/harteWired)
+
 Describe a page in YAML. Get production HTML with award-quality animations — validated for accessibility, performance-budgeted, and screenshot-verified before it ships. No Figma, no Webpack, no design handoff.
 
 This is an AI-native design generation pipeline built on Claude Code. You write a design brief — aesthetic keywords, section layout, motion preferences — and the generator produces semantic HTML, CSS with design tokens, and animation JS (GSAP + Lenis + ScrollTrigger). A validation loop catches HTML errors, WCAG violations, and performance regressions automatically, iterating up to 6 rounds until everything passes.
