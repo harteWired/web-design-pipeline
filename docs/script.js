@@ -235,6 +235,10 @@
 
     ScrollTrigger.batch('.reveal', {
       onEnter: function (batch) {
+        // will-change promotes each reveal target to its own GPU layer for the duration
+        // of its single fade-up so the motion doesn't trigger re-rasterization of nearby
+        // filtered/blended layers (Firefox WebRender). Cleared on complete.
+        batch.forEach(function (el) { el.style.willChange = 'opacity, transform'; });
         gsap.to(batch, {
           opacity: 1,
           y: 0,
@@ -242,6 +246,9 @@
           duration: 0.7,
           ease: 'power3.out',
           overwrite: true,
+          onComplete: function () {
+            batch.forEach(function (el) { el.style.willChange = 'auto'; });
+          },
         });
       },
       start: 'top 85%',
