@@ -58,6 +58,33 @@
     .topbar a:hover, .footbar a:hover { color: var(--color-accent-primary); }
     .wordmark { color: var(--color-accent-primary); font-weight: 600; letter-spacing: -0.02em; text-transform: none; font-size: 0.92rem; }
 
+    /* Tiny rabbit that fades into the topbar right when the bottom rabbit
+       is scrolled out of view. JS sets body[data-rabbit-offscreen="1"].
+       Default hidden so first paint has nothing in the slot. */
+    .topbar-rabbit {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 280ms ease;
+      padding: 0.2rem;
+      margin: -0.2rem;
+      border-radius: 4px;
+    }
+    .topbar-rabbit img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 6px oklch(0.78 0.14 55 / 0.35));
+      display: block;
+    }
+    body[data-rabbit-offscreen="1"] .topbar-rabbit {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .topbar-rabbit:hover img { filter: drop-shadow(0 0 8px oklch(0.78 0.14 55 / 0.55)); }
+
     /* col-left sizes to its tile content (up to 30rem so tags never truncate);
        col-right gets the remainder. minmax(0,..) lets the column shrink if the
        viewport is narrow, but the tile rows themselves are nowrap, so on narrow
@@ -190,43 +217,48 @@
     @media (max-width: 1049px) {
       body { overflow-y: auto; height: auto; min-height: 100svh; }
       .stage {
-        display: block;
+        display: flex;
+        flex-direction: column;
         position: relative;
         height: auto;
         padding: 4.75rem 1.4rem 4rem;
+        gap: 2rem;
       }
-      .col-left { max-width: none; width: 100%; }
+      .col-left { max-width: none; width: 100%; order: 1; }
 
-      /* Rabbit pinned to top-right, smaller */
+      /* Rabbit moves to the bottom of the stage — closer/door treatment.
+         Rings restored, larger than the old corner badge. */
       .col-right {
-        position: absolute;
-        top: 4.75rem;
-        right: 1.4rem;
-        width: 88px;
-        height: 122px;          /* rabbit + caption stacked */
+        order: 2;
+        position: relative;
+        top: auto;
+        right: auto;
+        width: 260px;
+        height: 290px;          /* rabbit-stage 260 + room for caption dangling below */
         max-height: none;
         aspect-ratio: auto;
-        margin: 0;
+        margin: 2rem auto 0;
         z-index: 5;
       }
-      .col-right .rabbit-stage { width: 88px; height: 88px; }
-      .col-right .rabbit-rings { display: none; }
-      .col-right .rabbit-img { width: 100%; height: 100%; }
+      .col-right .rabbit-stage { width: 260px; height: 260px; }
+      .col-right .rabbit-rings { display: block; }
+      .col-right .rabbit-img { width: 64%; height: 64%; }
       .col-right .rabbit-caption {
-        position: static;
-        transform: none;
+        position: absolute;
+        bottom: -1.4rem;
+        left: 50%;
+        transform: translateX(-50%);
         text-align: center;
         font-size: 0.55rem;
-        margin-top: 0.4rem;
         line-height: 1.2;
-        white-space: normal;
+        white-space: nowrap;
         padding: 0.25rem 0.4rem;
       }
 
-      /* Lockup leaves room on the right for the rabbit */
-      .lockup { padding-right: 110px; min-height: 110px; }
+      /* Lockup full-width — no rabbit competing for the headline row */
+      .lockup { padding-right: 0; min-height: auto; }
       .lockup__overline { margin-bottom: 0.85rem; color: oklch(0.68 0.015 270); }
-      .lockup__line1, .lockup__line2 { font-size: clamp(2rem, 9vw, 2.6rem); }
+      .lockup__line1, .lockup__line2 { font-size: clamp(2.4rem, 11vw, 3.4rem); }
       .lockup__sub { font-size: 0.95rem; max-width: none; padding-right: 0; color: oklch(0.82 0.01 270); }
 
       /* No lightning, no card on mobile */
@@ -341,6 +373,9 @@
 
   <header class="topbar" aria-label="Header">
     <a class="wordmark" href="/" aria-label="harteWired Lab">harteWired</a>
+    <a class="topbar-rabbit" id="topbarRabbit" href="/follow/" aria-label="Down the rabbit hole">
+      <img src="/assets/whiterabbiticon2.png" alt="" aria-hidden="true">
+    </a>
   </header>
 
   <main class="stage" id="stage">
@@ -442,6 +477,16 @@
       var raf = null, x = 0, y = 0;
       function paint() { spot.style.transform = 'translate(' + (x | 0) + 'px, ' + (y | 0) + 'px) translate(-50%, -50%)'; raf = null; }
       window.addEventListener('pointermove', function(e) { x = e.clientX; y = e.clientY; if (!raf) raf = requestAnimationFrame(paint); }, { passive: true });
+    })();
+
+    // ---- topbar-rabbit visibility: shows when bottom rabbit is offscreen ----
+    (function() {
+      var target = document.querySelector('.col-right');
+      if (!target || !('IntersectionObserver' in window)) return;
+      var io = new IntersectionObserver(function(entries) {
+        document.body.dataset.rabbitOffscreen = entries[0].isIntersecting ? '0' : '1';
+      }, { threshold: 0.15 });
+      io.observe(target);
     })();
 
     // ---- routing: build per-tile paths from dot to card outline ----
